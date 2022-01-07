@@ -1,9 +1,10 @@
+import React, { useState } from 'react';
 import { useEffect, useRef } from 'react';
 import P5 from 'p5';
 import './App.css';
 
 // Creating the sketch itself
-const sketch = (p5: P5) => {
+const sketchDefinition = (p5: P5) => {
     p5.setup = () => {
         p5.createCanvas(200, 200);
     };
@@ -15,20 +16,32 @@ const sketch = (p5: P5) => {
 };
 
 export default function App() {
-    const sketchRef = useRef(null);
-    useEffect(() => {
-        if (!sketchRef.current) {
-            return () => {};
-        }
-        const instance = new P5(sketch, sketchRef.current);
-        return () => {
-            instance.remove();
-        };
-    }, [sketchRef]);
+    const canvasRef = useRef<HTMLDivElement>(null);
+    useP5Instance(sketchDefinition, canvasRef);
 
     return (
         <div className="App">
-            <div ref={sketchRef}></div>
+            <div ref={canvasRef}></div>
         </div>
     );
+}
+
+function useP5Instance(
+    sketch: (p5: P5) => void,
+    ref: React.RefObject<HTMLDivElement>
+) {
+    const [instance, setInstance] = useState<P5 | null>(null);
+
+    useEffect(() => {
+        if (!ref.current) {
+            return () => {};
+        }
+        const newInstance = new P5(sketchDefinition, ref.current);
+        setInstance(newInstance);
+        return () => {
+            newInstance.remove();
+        };
+    }, [ref]);
+
+    return instance;
 }
