@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Line, Point, Rectangle } from '@mathigon/euclid';
+import { Line, Point, Bounds } from '@mathigon/euclid';
 import useMeasure from 'react-use-measure';
 import P5 from 'p5';
 import { random } from 'lodash';
@@ -9,7 +9,7 @@ const BALL_SIZE = 10;
 const TOTAL_BALLS = 1000;
 const MIN_BALL_SPEED = 30;
 const MAX_BALL_SPEED = 100;
-const DISTANCE_TO_MOUSE = 200;
+const DISTANCE_TO_MOUSE = 100;
 const MAX_PUNCH_SPEED = 50;
 const SECONDS_TO_DAMPEN = 5;
 
@@ -18,9 +18,10 @@ function getSketchDefinition(size: { width: number; height: number }) {
         return null;
     }
     const halfBall = BALL_SIZE / 2;
-    const container = new Rectangle(
-        new Point(-halfBall, -halfBall),
+    const container = new Bounds(
+        -halfBall,
         size.width + halfBall,
+        -halfBall,
         size.height + halfBall
     );
     const circles = new Array(TOTAL_BALLS)
@@ -46,13 +47,13 @@ class Circle {
     private speedPxPerSecond: number;
     private defaultSpeed: number;
     private directionRadians: number;
-    private containedIn: Rectangle;
+    private containedIn: Bounds;
 
-    constructor({ containedIn }: { containedIn: Rectangle }) {
+    constructor({ containedIn }: { containedIn: Bounds }) {
         this.containedIn = containedIn;
         this.position = new Point(
-            random(this.containedIn.p.x, this.containedIn.w, true),
-            random(this.containedIn.p.y, this.containedIn.h, true)
+            random(this.containedIn.xMin, this.containedIn.xMax, true),
+            random(this.containedIn.yMin, this.containedIn.yMax, true)
         );
         this.defaultSpeed = random(MIN_BALL_SPEED, MAX_BALL_SPEED, true);
         this.speedPxPerSecond = this.defaultSpeed;
@@ -164,10 +165,10 @@ function useP5Instance(
     return instance;
 }
 
-function keepPointInside(p: Point, r: Rectangle) {
+function keepPointInside(point: Point, bounds: Bounds) {
     return new Point(
-        keepNumberInside(p.x, r.p.x, r.w),
-        keepNumberInside(p.y, r.p.y, r.h)
+        keepNumberInside(point.x, bounds.xMin, bounds.xMax),
+        keepNumberInside(point.y, bounds.yMin, bounds.yMax)
     );
 }
 
