@@ -10,6 +10,8 @@ const TOTAL_BALLS = 1000;
 const MIN_BALL_SPEED = 30;
 const MAX_BALL_SPEED = 100;
 const DISTANCE_TO_MOUSE = 200;
+const MAX_PUNCH_SPEED = 50;
+const SECONDS_TO_DAMPEN = 5;
 
 function getSketchDefinition(size: { width: number; height: number }) {
     if (!size.width || !size.height) {
@@ -42,6 +44,7 @@ function getSketchDefinition(size: { width: number; height: number }) {
 class Circle {
     private position: Point;
     private speedPxPerSecond: number;
+    private defaultSpeed: number;
     private directionRadians: number;
     private containedIn: Rectangle;
 
@@ -51,7 +54,8 @@ class Circle {
             random(this.containedIn.p.x, this.containedIn.w, true),
             random(this.containedIn.p.y, this.containedIn.h, true)
         );
-        this.speedPxPerSecond = random(MIN_BALL_SPEED, MAX_BALL_SPEED, true);
+        this.defaultSpeed = random(MIN_BALL_SPEED, MAX_BALL_SPEED, true);
+        this.speedPxPerSecond = this.defaultSpeed;
         this.directionRadians = random(0, 2 * Math.PI, true);
     }
 
@@ -63,8 +67,15 @@ class Circle {
         if (!p5.deltaTime) {
             return;
         }
-        const mouse = new Point(p5.mouseX, p5.mouseY);
-        const distance = Point.distance(mouse, this.position);
+        const deltaSeconds = p5.deltaTime / 1000;
+        this.updateDirection(p5);
+        this.updatePosition(deltaSeconds);
+        this.dampenSpeed(deltaSeconds);
+    }
+
+    private updateDirection(p5: P5) {
+        const mouseCurrent = new Point(p5.mouseX, p5.mouseY);
+        const distance = Point.distance(mouseCurrent, this.position);
         if (distance < Number.MIN_VALUE) {
             this.directionRadians = keepNumberInside(
                 this.directionRadians + Math.PI,
@@ -72,11 +83,35 @@ class Circle {
                 2 * Math.PI
             );
         } else if (distance < DISTANCE_TO_MOUSE) {
-            const newDirection = new Line(mouse, this.position);
+            const newDirection = new Line(mouseCurrent, this.position);
             this.directionRadians = newDirection.angle;
+            const mousePrev = new Point(p5.pmouseX, p5.pmouseY);
+            const moved = Math.min(
+                Point.distance(mouseCurrent, mousePrev),
+                MAX_PUNCH_SPEED
+            );
+            this.speedPxPerSecond += moved;
         }
+    }
 
-        const deltaSeconds = p5.deltaTime / 1000;
+    private dampenSpeed(deltaSeconds: number) {
+        if (this.speedPxPerSecond === this.defaultSpeed) {
+            return;
+        }
+        const damper = Math.min(deltaSeconds / SECONDS_TO_DAMPEN, 1);
+
+        let newSpeed =
+            this.speedPxPerSecond +
+            (this.defaultSpeed - this.speedPxPerSecond) * damper;
+
+        // fix Zeno's paradox: value is snapped if we're within fraction of a distance unit (usually a pixel)
+        if (Math.abs(this.defaultSpeed - newSpeed) < 1) {
+            newSpeed = this.defaultSpeed;
+        }
+        this.speedPxPerSecond = newSpeed;
+    }
+
+    private updatePosition(deltaSeconds: number) {
         const delta = new Point(
             Math.cos(this.directionRadians) *
                 this.speedPxPerSecond *
