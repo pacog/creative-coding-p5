@@ -51,10 +51,7 @@ class Circle {
 
     constructor({ containedIn }: { containedIn: Bounds }) {
         this.containedIn = containedIn;
-        this.position = new Point(
-            random(this.containedIn.xMin, this.containedIn.xMax, true),
-            random(this.containedIn.yMin, this.containedIn.yMax, true)
-        );
+        this.position = Point.random(this.containedIn);
         this.defaultSpeed = random(MIN_BALL_SPEED, MAX_BALL_SPEED, true);
         this.speedPxPerSecond = this.defaultSpeed;
         this.directionRadians = random(0, 2 * Math.PI, true);
