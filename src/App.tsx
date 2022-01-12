@@ -1,14 +1,15 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Point, Rectangle } from '@mathigon/euclid';
+import { Line, Point, Rectangle } from '@mathigon/euclid';
 import useMeasure from 'react-use-measure';
 import P5 from 'p5';
 import { random } from 'lodash';
 import './App.css';
 
 const BALL_SIZE = 10;
-const TOTAL_BALLS = 300;
-const MIN_BALL_SPEED = 10;
-const MAX_BALL_SPEED = 40;
+const TOTAL_BALLS = 1000;
+const MIN_BALL_SPEED = 30;
+const MAX_BALL_SPEED = 100;
+const DISTANCE_TO_MOUSE = 200;
 
 function getSketchDefinition(size: { width: number; height: number }) {
     if (!size.width || !size.height) {
@@ -51,7 +52,7 @@ class Circle {
             random(this.containedIn.p.y, this.containedIn.h, true)
         );
         this.speedPxPerSecond = random(MIN_BALL_SPEED, MAX_BALL_SPEED, true);
-        this.directionRadians = random(0, Math.PI, true);
+        this.directionRadians = random(0, 2 * Math.PI, true);
     }
 
     draw(p5: P5) {
@@ -62,13 +63,25 @@ class Circle {
         if (!p5.deltaTime) {
             return;
         }
+        const mouse = new Point(p5.mouseX, p5.mouseY);
+        const distance = Point.distance(mouse, this.position);
+        if (distance < Number.MIN_VALUE) {
+            this.directionRadians = keepNumberInside(
+                this.directionRadians + Math.PI,
+                0,
+                2 * Math.PI
+            );
+        } else if (distance < DISTANCE_TO_MOUSE) {
+            const newDirection = new Line(mouse, this.position);
+            this.directionRadians = newDirection.angle;
+        }
 
         const deltaSeconds = p5.deltaTime / 1000;
         const delta = new Point(
-            Math.sin(this.directionRadians) *
+            Math.cos(this.directionRadians) *
                 this.speedPxPerSecond *
                 deltaSeconds,
-            Math.cos(this.directionRadians) *
+            Math.sin(this.directionRadians) *
                 this.speedPxPerSecond *
                 deltaSeconds
         );
