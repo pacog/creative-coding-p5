@@ -2,11 +2,13 @@ import { Bounds, Circle, Point } from '@mathigon/euclid';
 import P5Sketch from 'components/P5Sketch';
 import type P5 from 'p5';
 import chroma from 'chroma-js';
-import { range } from 'lodash';
+import { now, range } from 'lodash';
 
 export default function RandomFractals() {
     return <P5Sketch getSketchDefinition={getSketchDefinition} />;
 }
+
+const ROTATE_EVERY = 100000; //ms
 
 function getSketchDefinition(size: { width: number; height: number }) {
     if (!size.width || !size.height) {
@@ -18,16 +20,17 @@ function getSketchDefinition(size: { width: number; height: number }) {
 
         p5.setup = () => {
             p5.createCanvas(size.width, size.height);
-            p5.noLoop();
         };
 
         p5.draw = () => {
             p5.background(getColorForDepth(0));
             const bounds = new Bounds(0, size.width, 0, size.height);
+            const rotationRatio = (now() % ROTATE_EVERY) / ROTATE_EVERY;
             drawRecursiveCircle(
                 p5,
                 bounds.center,
                 Math.min(size.width, size.height),
+                rotationRatio,
                 1
             );
         };
@@ -48,9 +51,10 @@ function drawRecursiveCircle(
     p5: P5,
     center: Point,
     diameter: number,
+    rotationRatio: number, // 0 to 1
     depth: number
 ) {
-    if (depth >= 8) {
+    if (depth >= 7) {
         return;
     }
     p5.noStroke();
@@ -63,11 +67,37 @@ function drawRecursiveCircle(
     const circle = new Circle(center, diameter / 2 - smallCircleRadius);
 
     range(circlesToPaint).forEach((index) => {
+        const rotation = keepNumberInside(
+            rotationRatio + index / circlesToPaint,
+            0,
+            1
+        );
         drawRecursiveCircle(
             p5,
-            circle.at(index / circlesToPaint),
+            circle.at(rotation),
             smallCircleRadius * 2,
+            1 - rotationRatio,
             depth + 1
         );
     });
+}
+
+// TODO extract
+function keepNumberInside(n: number, lowerLimit: number, upperLimit: number) {
+    const size = upperLimit - lowerLimit;
+    let res = n;
+
+    if (upperLimit <= lowerLimit) {
+        throw new Error('lower limit is bigger than upper limit');
+    }
+    if (n > lowerLimit && n <= upperLimit) {
+        return n;
+    }
+    while (res < lowerLimit) {
+        res += size;
+    }
+    while (res > upperLimit) {
+        res -= size;
+    }
+    return res;
 }
