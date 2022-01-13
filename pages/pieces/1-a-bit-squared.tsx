@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
+import type P5 from 'p5';
 import { Line, Point, Bounds } from '@mathigon/euclid';
 import useMeasure from 'react-use-measure';
 import { now, random } from 'lodash';
