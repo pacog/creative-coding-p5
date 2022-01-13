@@ -33,24 +33,30 @@ function useP5Instance(
     ref: React.RefObject<HTMLDivElement>
 ) {
     const [instance, setInstance] = useState<P5 | null>(null);
+    const [isP5Loaded, setIsP5Loaded] = useState(false);
+    const P5LibRef = useRef<typeof P5 | null>(null);
 
     useEffect(() => {
-        if (!ref.current || !sketch) {
+        if (!ref.current || !sketch || !isP5Loaded || !P5LibRef.current) {
             return () => {};
         }
         console.log('Creating P5 scene');
-        let newInstance;
-        import('p5').then(({ default: P5 }) => {
-            const newInstance = new P5(sketch, ref.current);
-            setInstance(newInstance);
-        });
+        const newInstance = new P5LibRef.current(sketch, ref.current);
+        setInstance(newInstance);
 
         return () => {
             if (newInstance) {
                 newInstance.remove();
             }
         };
-    }, [ref, sketch]);
+    }, [ref, sketch, P5LibRef, isP5Loaded]);
+
+    useEffect(() => {
+        import('p5').then(({ default: P5Lib }) => {
+            P5LibRef.current = P5Lib;
+            setIsP5Loaded(true);
+        });
+    }, []);
 
     return instance;
 }
