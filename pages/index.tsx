@@ -8,6 +8,11 @@ export default function Index() {
                 <li>
                     <Link href="/pieces/1-a-bit-squared">1. A bit squared</Link>
                 </li>
+                <li>
+                    <Link href="/pieces/2-random-fractals">
+                        2. Random fractals
+                    </Link>
+                </li>
             </ul>
         </div>
     );
