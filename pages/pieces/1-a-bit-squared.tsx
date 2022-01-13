@@ -4,7 +4,7 @@ import { Line, Point, Bounds } from '@mathigon/euclid';
 import useMeasure from 'react-use-measure';
 import { now, random } from 'lodash';
 import chroma from 'chroma-js';
-import styles from './ABitSquared.module.css';
+import P5Sketch from 'components/P5Sketch';
 
 const BALL_SIZE = 40;
 const TOTAL_BALLS = 1000;
@@ -23,6 +23,10 @@ const COLOR_SCALE = chroma.scale([
     '#9d4edd',
     '#c77dff',
 ]);
+
+export default function ABitSquared() {
+    return <P5Sketch getSketchDefinition={getSketchDefinition} />;
+}
 
 function getSketchDefinition(size: { width: number; height: number }) {
     if (!size.width || !size.height) {
@@ -169,51 +173,6 @@ class Circle {
             this.colorInScale = this.originalColorInScale;
         }
     }
-}
-
-export default function ABitSquared() {
-    const canvasRef = useRef<HTMLDivElement>(null);
-    const [containerRef, bounds] = useMeasure();
-    const sketch = useMemo(() => getSketchDefinition(bounds), [bounds]);
-    useP5Instance(sketch, canvasRef);
-
-    return (
-        <div className={styles.ABitSquared}>
-            <div
-                className={styles['ABitSquared-canvas-container']}
-                ref={containerRef}
-            >
-                <div ref={canvasRef}></div>
-            </div>
-        </div>
-    );
-}
-
-function useP5Instance(
-    sketch: ((p5: P5) => void) | null,
-    ref: React.RefObject<HTMLDivElement>
-) {
-    const [instance, setInstance] = useState<P5 | null>(null);
-
-    useEffect(() => {
-        if (!ref.current || !sketch) {
-            return () => {};
-        }
-        console.log('Creating P5 scene');
-        let newInstance;
-        import('p5').then(({ default: P5 }) => {
-            const newInstance = new P5(sketch, ref.current);
-            setInstance(newInstance);
-        });
-
-        return () => {
-            if (newInstance) {
-                newInstance.remove();
-            }
-        };
-    }, [ref, sketch]);
-
-    return instance;
 }
 
 function keepPointInside(point: Point, bounds: Bounds) {
