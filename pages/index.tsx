@@ -6,7 +6,7 @@ export default function Index() {
             <h1>Creative coding p5</h1>
             <ul>
                 <li>
-                    <Link href="pieces/1-a-bit-squared">1. A bit squared</Link>
+                    <Link href="/pieces/1-a-bit-squared">1. A bit squared</Link>
                 </li>
             </ul>
         </div>
