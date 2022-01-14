@@ -26,12 +26,11 @@ const COLOR_SCALE = chroma.scale([
 
 export default function ABitSquared() {
     return (
-        <PieceLayout
-            title="A bit squared"
-            description="Squares floating around and being pushed by your mouse"
-        >
-            <P5Sketch getSketchDefinition={getSketchDefinition} />
-        </PieceLayout>
+        <>
+            <PieceLayout id={1}>
+                <P5Sketch getSketchDefinition={getSketchDefinition} />
+            </PieceLayout>
+        </>
     );
 }
 

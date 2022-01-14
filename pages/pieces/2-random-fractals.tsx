@@ -7,10 +7,7 @@ import PieceLayout from 'components/PieceLayout';
 
 export default function RandomFractals() {
     return (
-        <PieceLayout
-            title="Random fractals"
-            description="Fun with fractal circles"
-        >
+        <PieceLayout id={2}>
             <P5Sketch getSketchDefinition={getSketchDefinition} />
         </PieceLayout>
     );
