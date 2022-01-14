@@ -4,6 +4,7 @@ import chroma from 'chroma-js';
 import { now, range } from 'lodash';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
+import { keepNumberInside } from 'utils/number';
 
 export default function RandomFractals() {
     return (
@@ -85,24 +86,4 @@ function drawRecursiveCircle(
             depth + 1
         );
     });
-}
-
-// TODO extract
-function keepNumberInside(n: number, lowerLimit: number, upperLimit: number) {
-    const size = upperLimit - lowerLimit;
-    let res = n;
-
-    if (upperLimit <= lowerLimit) {
-        throw new Error('lower limit is bigger than upper limit');
-    }
-    if (n > lowerLimit && n <= upperLimit) {
-        return n;
-    }
-    while (res < lowerLimit) {
-        res += size;
-    }
-    while (res > upperLimit) {
-        res -= size;
-    }
-    return res;
 }

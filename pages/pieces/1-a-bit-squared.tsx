@@ -5,6 +5,7 @@ import { now, random } from 'lodash';
 import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
+import { keepNumberInside } from 'utils/number';
 
 const BALL_SIZE = 40;
 const TOTAL_BALLS = 1000;
@@ -186,25 +187,6 @@ function keepPointInside(point: Point, bounds: Bounds) {
         keepNumberInside(point.x, bounds.xMin, bounds.xMax),
         keepNumberInside(point.y, bounds.yMin, bounds.yMax)
     );
-}
-
-function keepNumberInside(n: number, lowerLimit: number, upperLimit: number) {
-    const size = upperLimit - lowerLimit;
-    let res = n;
-
-    if (upperLimit <= lowerLimit) {
-        throw new Error('lower limit is bigger than upper limit');
-    }
-    if (n > lowerLimit && n <= upperLimit) {
-        return n;
-    }
-    while (res < lowerLimit) {
-        res += size;
-    }
-    while (res > upperLimit) {
-        res -= size;
-    }
-    return res;
 }
 
 function project(
