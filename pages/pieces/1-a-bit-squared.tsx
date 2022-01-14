@@ -50,17 +50,25 @@ function getSketchDefinition(size: { width: number; height: number }) {
         .fill(0)
         .map(() => new Circle({ containedIn: container }));
 
+    let isMouseIn = true;
+
     const sketchDefinition = (p5: P5) => {
         p5.disableFriendlyErrors = true;
 
         p5.setup = () => {
-            p5.createCanvas(size.width, size.height);
+            const canvas = p5.createCanvas(size.width, size.height);
+            canvas.mouseOver(() => {
+                isMouseIn = true;
+            });
+            canvas.mouseOut(() => {
+                isMouseIn = false;
+            });
         };
 
         p5.draw = () => {
             p5.background(BG_COLOR);
             circles.forEach((circle) => circle.draw(p5));
-            circles.forEach((circle) => circle.update(p5));
+            circles.forEach((circle) => circle.update(p5, isMouseIn));
         };
     };
     return sketchDefinition;
@@ -94,12 +102,15 @@ class Circle {
         p5.square(this.position.x, this.position.y, BALL_SIZE);
     }
 
-    update(p5: P5) {
+    update(p5: P5, isMouseIn: boolean) {
         if (!p5.deltaTime) {
             return;
         }
         const deltaSeconds = p5.deltaTime / 1000;
-        this.updateDirection(p5);
+        if (isMouseIn) {
+            this.updateDirection(p5);
+        }
+
         this.updatePosition(deltaSeconds);
         this.dampenSpeed(deltaSeconds);
         this.updateColor();
