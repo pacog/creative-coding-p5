@@ -13,12 +13,12 @@ export default function Index() {
                 <ul>
                     <li>
                         <Link href="/pieces/1-a-bit-squared">
-                            1. {pieces[1].title}
+                            <a>1. {pieces[1].title}</a>
                         </Link>
                     </li>
                     <li>
                         <Link href="/pieces/2-random-fractals">
-                            2. {pieces[2].title}
+                            <a>2. {pieces[2].title}</a>
                         </Link>
                     </li>
                 </ul>
