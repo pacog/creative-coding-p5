@@ -28,6 +28,7 @@ export default function PieceLayout({ children, id }: PieceLayoutProps) {
                                     src="/icons/arrow_back_icon.svg"
                                     height={32}
                                     width={32}
+                                    alt="Back"
                                 />
                             </div>
                         </a>
