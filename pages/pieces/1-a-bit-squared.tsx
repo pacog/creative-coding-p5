@@ -1,6 +1,6 @@
 import React from 'react';
 import type P5 from 'p5';
-import { Line, Point, Bounds } from '@mathigon/euclid';
+import { Line, Point, Bounds, Circle } from '@mathigon/euclid';
 import { now, random } from 'lodash';
 import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
@@ -15,6 +15,8 @@ const DISTANCE_TO_MOUSE = 100;
 const MAX_PUNCH_SPEED = 50;
 const SECONDS_TO_DAMPEN = 3;
 const TIME_WITH_COLOR_AFTER_COLLISION = 3;
+const MOUSE_BASE_ROTATION = 0.2; // rps
+const MOUSE_MAX_ROTATION = 2; // rps
 
 const BG_COLOR = '#10002b';
 const COLOR_SCALE = chroma.scale([
@@ -48,7 +50,9 @@ function getSketchDefinition(size: { width: number; height: number }) {
     );
     const circles = new Array(TOTAL_BALLS)
         .fill(0)
-        .map(() => new Circle({ containedIn: container }));
+        .map(() => new CircleInSketch({ containedIn: container }));
+
+    const customCursor = new CustomCursor();
 
     let isMouseIn = true;
 
@@ -57,6 +61,7 @@ function getSketchDefinition(size: { width: number; height: number }) {
 
         p5.setup = () => {
             const canvas = p5.createCanvas(size.width, size.height);
+            p5.noCursor();
             canvas.mouseOver(() => {
                 isMouseIn = true;
             });
@@ -69,12 +74,13 @@ function getSketchDefinition(size: { width: number; height: number }) {
             p5.background(BG_COLOR);
             circles.forEach((circle) => circle.draw(p5));
             circles.forEach((circle) => circle.update(p5, isMouseIn));
+            customCursor.draw(p5, isMouseIn);
         };
     };
     return sketchDefinition;
 }
 
-class Circle {
+class CircleInSketch {
     private position: Point;
     private speedPxPerSecond: number;
     private defaultSpeed: number;
@@ -190,6 +196,80 @@ class Circle {
         } else {
             this.colorInScale = this.originalColorInScale;
         }
+    }
+}
+
+class CustomCursor {
+    private rotation = 0;
+
+    constructor() {}
+
+    draw(p5: P5, isMouseIn: boolean) {
+        if (!isMouseIn || !p5.deltaTime) {
+            return;
+        }
+        const speed = Point.distance(
+            new Point(p5.movedX, p5.movedY),
+            new Point(0, 0)
+        );
+        const baseRotation = (p5.deltaTime / 1000) * MOUSE_BASE_ROTATION;
+        const MAX_SPEED_CONSIDERED = 5;
+        const speedRotation =
+            ((p5.deltaTime / 1000) *
+                (MOUSE_MAX_ROTATION - MOUSE_BASE_ROTATION) *
+                Math.min(speed, MAX_SPEED_CONSIDERED)) /
+            10;
+
+        this.rotation = keepNumberInside(
+            this.rotation + baseRotation + speedRotation,
+            0,
+            1
+        );
+        // const color = COLOR_SCALE(this.colorInScale).rgb();
+        const circle1 = new Circle(
+            new Point(p5.mouseX, p5.mouseY),
+            DISTANCE_TO_MOUSE / 2
+        );
+
+        const firstVertex = circle1.at(this.rotation);
+        const secondVertex = circle1.at(
+            keepNumberInside(this.rotation + 1 / 3, 0, 1)
+        );
+        const thirdVertex = circle1.at(
+            keepNumberInside(this.rotation + 2 / 3, 0, 1)
+        );
+
+        const color1 = chroma('#eeef20').rgb();
+        p5.stroke(...color1);
+        p5.strokeWeight(4);
+        p5.noFill();
+        p5.triangle(
+            firstVertex.x,
+            firstVertex.y,
+            secondVertex.x,
+            secondVertex.y,
+            thirdVertex.x,
+            thirdVertex.y
+        );
+
+        const firstVertexB = circle1.at(keepNumberInside(-this.rotation, 0, 1));
+        const secondVertexB = circle1.at(
+            keepNumberInside(-this.rotation - 1 / 3, 0, 1)
+        );
+        const thirdVertexB = circle1.at(
+            keepNumberInside(-this.rotation - 2 / 3, 0, 1)
+        );
+
+        const color2 = chroma('#aacc00').rgb();
+        p5.stroke(...color2);
+        p5.triangle(
+            firstVertexB.x,
+            firstVertexB.y,
+            secondVertexB.x,
+            secondVertexB.y,
+            thirdVertexB.x,
+            thirdVertexB.y
+        );
     }
 }
 
