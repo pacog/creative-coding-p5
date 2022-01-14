@@ -4,6 +4,7 @@ import { Line, Point, Bounds } from '@mathigon/euclid';
 import { now, random } from 'lodash';
 import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
+import PieceLayout from 'components/PieceLayout';
 
 const BALL_SIZE = 40;
 const TOTAL_BALLS = 1000;
@@ -24,7 +25,14 @@ const COLOR_SCALE = chroma.scale([
 ]);
 
 export default function ABitSquared() {
-    return <P5Sketch getSketchDefinition={getSketchDefinition} />;
+    return (
+        <PieceLayout
+            title="A bit squared"
+            description="Squares floating around and being pushed by your mouse"
+        >
+            <P5Sketch getSketchDefinition={getSketchDefinition} />
+        </PieceLayout>
+    );
 }
 
 function getSketchDefinition(size: { width: number; height: number }) {

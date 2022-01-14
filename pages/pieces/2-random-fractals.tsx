@@ -1,11 +1,19 @@
 import { Bounds, Circle, Point } from '@mathigon/euclid';
-import P5Sketch from 'components/P5Sketch';
 import type P5 from 'p5';
 import chroma from 'chroma-js';
 import { now, range } from 'lodash';
+import P5Sketch from 'components/P5Sketch';
+import PieceLayout from 'components/PieceLayout';
 
 export default function RandomFractals() {
-    return <P5Sketch getSketchDefinition={getSketchDefinition} />;
+    return (
+        <PieceLayout
+            title="Random fractals"
+            description="Fun with fractal circles"
+        >
+            <P5Sketch getSketchDefinition={getSketchDefinition} />
+        </PieceLayout>
+    );
 }
 
 const ROTATE_EVERY = 100000; //ms
