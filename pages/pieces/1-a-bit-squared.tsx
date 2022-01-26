@@ -5,7 +5,7 @@ import { now, random } from 'lodash';
 import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
-import { keepNumberInside } from 'utils/number';
+import { keepNumberInside, project } from 'utils/number';
 
 const BALL_SIZE = 40;
 const TOTAL_BALLS = 1000;
@@ -278,15 +278,4 @@ function keepPointInside(point: Point, bounds: Bounds) {
         keepNumberInside(point.x, bounds.xMin, bounds.xMax),
         keepNumberInside(point.y, bounds.yMin, bounds.yMax)
     );
-}
-
-function project(
-    n: number,
-    nMin: number,
-    nMax: number,
-    destMin: number,
-    destMax: number
-) {
-    const percentageInOrigin = n / (nMax - nMin);
-    return destMin + percentageInOrigin * (destMax - destMin);
 }

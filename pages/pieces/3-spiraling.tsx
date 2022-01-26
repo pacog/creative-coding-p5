@@ -3,7 +3,7 @@ import type P5 from 'p5';
 import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
-import { random, update } from 'lodash';
+import { project } from 'utils/number';
 
 export default function RandomFractals() {
     return (
@@ -13,9 +13,9 @@ export default function RandomFractals() {
     );
 }
 
-const SPIRALS = 100;
+const SPIRALS = 6;
 const MIN_START = 1;
-const MAX_START = 20;
+const MAX_START = 6;
 
 function getSketchDefinition(size: { width: number; height: number }) {
     if (!size.width || !size.height) {
@@ -32,11 +32,15 @@ function getSketchDefinition(size: { width: number; height: number }) {
 
         p5.draw = () => {
             p5.background('#fff');
+            const scale = chroma.scale(['#9d4edd', '#3c096c']);
             for (let i = 0; i < SPIRALS; i++) {
+                const fib = project(i, 0, SPIRALS, MIN_START, MAX_START);
+
                 drawSpiral(
                     p5,
-                    random(MIN_START, MAX_START, true),
-                    random(0, 3, false)
+                    project(i, 0, SPIRALS, MIN_START, MAX_START),
+                    scale(project(i, 0, SPIRALS, 0, 1)),
+                    0
                 );
             }
         };
@@ -44,7 +48,12 @@ function getSketchDefinition(size: { width: number; height: number }) {
     return sketchDefinition;
 }
 
-function drawSpiral(p5: P5, fibonacciStart = 1, startingDirectionIndex = 0) {
+function drawSpiral(
+    p5: P5,
+    fibonacciStart = 1,
+    color: chroma.Color,
+    startingDirectionIndex = 0
+) {
     const initialPoint = new Point(
         Math.floor(p5.width / 3),
         Math.floor(p5.height / 3)
@@ -55,12 +64,22 @@ function drawSpiral(p5: P5, fibonacciStart = 1, startingDirectionIndex = 0) {
         fibonacciStart,
         startingDirectionIndex
     );
-    const color = chroma.random().rgb();
-    p5.stroke(...color);
+    p5.stroke(...color.rgb());
     p5.noFill();
-
-    for (const square of squares) {
-        p5.rect(square.p.x, square.p.y, square.w, square.h);
+    let index = 1;
+    for (const { square, direction } of squares) {
+        p5.strokeWeight(index);
+        const arc = getArcFromSquareAndDirection(square, direction);
+        p5.arc(
+            arc.centerX,
+            arc.centerY,
+            arc.w,
+            arc.h,
+            arc.angleStart,
+            arc.angleEnd,
+            p5.OPEN
+        );
+        index++;
     }
 }
 enum Direction {
@@ -68,6 +87,47 @@ enum Direction {
     Down,
     Left,
     Right,
+}
+
+function getArcFromSquareAndDirection(square: Rectangle, direction: Direction) {
+    switch (direction) {
+        case Direction.Right:
+            return {
+                centerX: square.p.x,
+                centerY: square.p.y,
+                w: 2 * square.w,
+                h: 2 * square.h,
+                angleStart: 0,
+                angleEnd: Math.PI / 2,
+            };
+        case Direction.Up:
+            return {
+                centerX: square.p.x,
+                centerY: square.p.y + square.h,
+                w: 2 * square.w,
+                h: 2 * square.h,
+                angleStart: (3 * Math.PI) / 2,
+                angleEnd: 2 * Math.PI,
+            };
+        case Direction.Left:
+            return {
+                centerX: square.p.x + square.w,
+                centerY: square.p.y + square.h,
+                w: 2 * square.w,
+                h: 2 * square.h,
+                angleStart: Math.PI,
+                angleEnd: (3 * Math.PI) / 2,
+            };
+        case Direction.Down:
+            return {
+                centerX: square.p.x + square.w,
+                centerY: square.p.y,
+                w: 2 * square.w,
+                h: 2 * square.h,
+                angleStart: Math.PI / 2,
+                angleEnd: Math.PI,
+            };
+    }
 }
 
 function* spiralSquaresGenerator(
@@ -86,17 +146,23 @@ function* spiralSquaresGenerator(
     const fibonacci = fibonacciGenerator(fibonacciStart);
     let fibValue = fibonacci.next().value || 0;
     let lastRectangle = new Rectangle(initialPoint, fibValue, fibValue);
-    yield lastRectangle;
+    yield {
+        square: lastRectangle,
+        direction: directions[directionIndex],
+    };
 
     while (lastRectangle.w < bounds.dx || lastRectangle.h < bounds.dy) {
+        directionIndex = (directionIndex + 1) % directions.length;
         fibValue = fibonacci.next().value || 0;
         lastRectangle = getRectangleFromLastAndDirection(
             lastRectangle,
             directions[directionIndex],
             fibValue
         );
-        yield lastRectangle;
-        directionIndex = (directionIndex + 1) % directions.length;
+        yield {
+            square: lastRectangle,
+            direction: directions[directionIndex],
+        };
     }
 }
 

@@ -24,3 +24,17 @@ export function keepNumberInside(
     }
     return res;
 }
+
+/**
+ * Projects a value from a scale to another into a [min, max] interval
+ */
+export function project(
+    n: number,
+    nMin: number,
+    nMax: number,
+    destMin: number,
+    destMax: number
+) {
+    const percentageInOrigin = n / (nMax - nMin);
+    return destMin + percentageInOrigin * (destMax - destMin);
+}
