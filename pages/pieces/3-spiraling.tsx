@@ -4,6 +4,7 @@ import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import { project } from 'utils/number';
+import { random } from 'lodash';
 
 export default function RandomFractals() {
     return (
@@ -13,9 +14,20 @@ export default function RandomFractals() {
     );
 }
 
-const SPIRALS = 6;
+const SPIRALS_PER_GROUP = 3;
+const GROUPS = 5;
 const MIN_START = 1;
-const MAX_START = 6;
+const MAX_START = 2;
+
+const SCALES = [
+    chroma.scale(['#9d4edd', '#3c096c']),
+    chroma.scale(['#1a759f', '#184e77']),
+    chroma.scale(['#c9184a', '#ff4d6d']),
+    chroma.scale(['#d9ed92', '#b5e48c']),
+    chroma.scale(['#7b2cbf', '#9d4edd']),
+    chroma.scale(['#ffdd00', '#ffea00']),
+    chroma.scale(['#74c69d', '#40916c']),
+];
 
 function getSketchDefinition(size: { width: number; height: number }) {
     if (!size.width || !size.height) {
@@ -32,32 +44,49 @@ function getSketchDefinition(size: { width: number; height: number }) {
 
         p5.draw = () => {
             p5.background('#fff');
-            const scale = chroma.scale(['#9d4edd', '#3c096c']);
-            for (let i = 0; i < SPIRALS; i++) {
-                const fib = project(i, 0, SPIRALS, MIN_START, MAX_START);
-
-                drawSpiral(
-                    p5,
-                    project(i, 0, SPIRALS, MIN_START, MAX_START),
-                    scale(project(i, 0, SPIRALS, 0, 1)),
-                    0
-                );
+            for (let i = 0; i < GROUPS; i++) {
+                drawSpiralGroup(p5, SCALES[i % SCALES.length]);
             }
         };
     };
     return sketchDefinition;
 }
 
+function drawSpiralGroup(p5: P5, scale: chroma.Scale<chroma.Color>) {
+    const bounds = getRandomBounds(p5);
+    for (let i = 0; i < SPIRALS_PER_GROUP; i++) {
+        const initialPoint = Point.random(bounds);
+        drawSpiral(
+            p5,
+            project(i, 0, SPIRALS_PER_GROUP, MIN_START, MAX_START),
+            scale(project(i, 0, SPIRALS_PER_GROUP, 0, 1)),
+            initialPoint,
+            random(0, 3, false)
+        );
+    }
+}
+
+function getRandomBounds(p5: P5) {
+    const divisionsX = 20;
+    const divisionsY = 20;
+
+    const quadrantX = random(0, divisionsX - 1, false);
+    const quadrantY = random(0, divisionsY - 1, false);
+    return new Bounds(
+        (quadrantX * p5.width) / divisionsX,
+        ((quadrantX + 1) * p5.width) / divisionsX,
+        (quadrantY * p5.width) / divisionsY,
+        ((quadrantY + 1) * p5.width) / divisionsY
+    );
+}
+
 function drawSpiral(
     p5: P5,
     fibonacciStart = 1,
     color: chroma.Color,
+    initialPoint: Point,
     startingDirectionIndex = 0
 ) {
-    const initialPoint = new Point(
-        Math.floor(p5.width / 3),
-        Math.floor(p5.height / 3)
-    );
     const squares = spiralSquaresGenerator(
         initialPoint,
         new Bounds(0, p5.width, 0, p5.height),
