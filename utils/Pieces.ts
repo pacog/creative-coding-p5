@@ -7,4 +7,8 @@ export const pieces = {
         title: 'Random fractals',
         description: 'Fun with fractal circles',
     },
+    3: {
+        title: 'Spiraling',
+        description: 'Fibonacci spirals',
+    },
 };

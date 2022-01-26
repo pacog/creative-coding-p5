@@ -21,6 +21,11 @@ export default function Index() {
                             <a>2. {pieces[2].title}</a>
                         </Link>
                     </li>
+                    <li>
+                        <Link href="/pieces/3-spiraling">
+                            <a>3. {pieces[3].title}</a>
+                        </Link>
+                    </li>
                 </ul>
             </div>
         </>

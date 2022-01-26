@@ -16,8 +16,11 @@ export default function PieceLayout({ children, id }: PieceLayoutProps) {
     return (
         <>
             <Head>
-                <title>{pieces[1].title}</title>
-                <meta name="description" content={pieces[1].description}></meta>
+                <title>{pieces[id].title}</title>
+                <meta
+                    name="description"
+                    content={pieces[id].description}
+                ></meta>
             </Head>
             <div className={styles.Container}>
                 <div className={styles.Header}>
