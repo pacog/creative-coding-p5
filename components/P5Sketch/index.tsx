@@ -1,23 +1,16 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type P5 from 'p5';
 import useMeasure from 'react-use-measure';
 import styles from './style.module.css';
 
 interface P5SketchProps {
-    getSketchDefinition: (size: {
-        width: number;
-        height: number;
-    }) => ((p5: P5) => void) | null;
+    sketchDefinition: (p5: P5) => void;
 }
 
-export default function P5Sketch({ getSketchDefinition }: P5SketchProps) {
+export default function P5Sketch({ sketchDefinition }: P5SketchProps) {
     const canvasRef = useRef<HTMLDivElement>(null);
     const [containerRef, bounds] = useMeasure();
-    const sketch = useMemo(
-        () => getSketchDefinition(bounds),
-        [bounds, getSketchDefinition]
-    );
-    useP5Instance(sketch, canvasRef);
+    useP5Instance(sketchDefinition, canvasRef);
 
     return (
         <div className={styles.Root}>

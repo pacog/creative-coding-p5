@@ -6,42 +6,39 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import { keepNumberInside } from 'utils/number';
 
+const ROTATE_EVERY = 100000; //ms
+
+const sketchDefinition = (p5: P5) => {
+    p5.disableFriendlyErrors = true;
+
+    p5.setup = () => {
+        p5.createCanvas(p5.windowWidth, p5.windowHeight);
+    };
+
+    p5.windowResized = () => {
+        p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+    };
+
+    p5.draw = () => {
+        p5.background(getColorForDepth(0));
+        const bounds = new Bounds(0, p5.windowWidth, 0, p5.windowHeight);
+        const rotationRatio = (now() % ROTATE_EVERY) / ROTATE_EVERY;
+        drawRecursiveCircle(
+            p5,
+            bounds.center,
+            Math.min(p5.windowWidth, p5.windowHeight),
+            rotationRatio,
+            1
+        );
+    };
+};
+
 export default function RandomFractals() {
     return (
         <PieceLayout id={2}>
-            <P5Sketch getSketchDefinition={getSketchDefinition} />
+            <P5Sketch sketchDefinition={sketchDefinition} />
         </PieceLayout>
     );
-}
-
-const ROTATE_EVERY = 100000; //ms
-
-function getSketchDefinition(size: { width: number; height: number }) {
-    if (!size.width || !size.height) {
-        return null;
-    }
-
-    const sketchDefinition = (p5: P5) => {
-        p5.disableFriendlyErrors = true;
-
-        p5.setup = () => {
-            p5.createCanvas(size.width, size.height);
-        };
-
-        p5.draw = () => {
-            p5.background(getColorForDepth(0));
-            const bounds = new Bounds(0, size.width, 0, size.height);
-            const rotationRatio = (now() % ROTATE_EVERY) / ROTATE_EVERY;
-            drawRecursiveCircle(
-                p5,
-                bounds.center,
-                Math.min(size.width, size.height),
-                rotationRatio,
-                1
-            );
-        };
-    };
-    return sketchDefinition;
 }
 
 function getColorForDepth(depth: number) {

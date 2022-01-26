@@ -9,7 +9,7 @@ import { random } from 'lodash';
 export default function RandomFractals() {
     return (
         <PieceLayout id={3}>
-            <P5Sketch getSketchDefinition={getSketchDefinition} />
+            <P5Sketch sketchDefinition={sketchDefinition} />
         </PieceLayout>
     );
 }
@@ -29,28 +29,25 @@ const SCALES = [
     chroma.scale(['#74c69d', '#40916c']),
 ];
 
-function getSketchDefinition(size: { width: number; height: number }) {
-    if (!size.width || !size.height) {
-        return null;
-    }
+const sketchDefinition = (p5: P5) => {
+    p5.disableFriendlyErrors = true;
 
-    const sketchDefinition = (p5: P5) => {
-        p5.disableFriendlyErrors = true;
-
-        p5.setup = () => {
-            p5.createCanvas(size.width, size.height);
-            p5.noLoop();
-        };
-
-        p5.draw = () => {
-            p5.background('#fff');
-            for (let i = 0; i < GROUPS; i++) {
-                drawSpiralGroup(p5, SCALES[i % SCALES.length]);
-            }
-        };
+    p5.setup = () => {
+        p5.createCanvas(p5.windowWidth, p5.windowHeight);
+        p5.noLoop();
     };
-    return sketchDefinition;
-}
+
+    p5.windowResized = () => {
+        p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+    };
+
+    p5.draw = () => {
+        p5.background('#fff');
+        for (let i = 0; i < GROUPS; i++) {
+            drawSpiralGroup(p5, SCALES[i % SCALES.length]);
+        }
+    };
+};
 
 function drawSpiralGroup(p5: P5, scale: chroma.Scale<chroma.Color>) {
     const bounds = getRandomBounds(p5);

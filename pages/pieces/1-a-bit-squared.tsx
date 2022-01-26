@@ -27,57 +27,63 @@ const COLOR_SCALE = chroma.scale([
     '#c77dff',
 ]);
 
+let isMouseIn = true;
+
+const sketchDefinition = (p5: P5) => {
+    p5.disableFriendlyErrors = true;
+
+    const halfBall = BALL_SIZE / 2;
+    let container: Bounds;
+    let circles: CircleInSketch[];
+    let customCursor: CustomCursor;
+
+    function init() {
+        container = new Bounds(
+            -halfBall,
+            p5.windowWidth + halfBall,
+            -halfBall,
+            p5.windowHeight + halfBall
+        );
+        circles = new Array(TOTAL_BALLS)
+            .fill(0)
+            .map(() => new CircleInSketch({ containedIn: container }));
+
+        customCursor = new CustomCursor();
+    }
+
+    p5.setup = () => {
+        const canvas = p5.createCanvas(p5.windowWidth, p5.windowHeight);
+        p5.noCursor();
+        canvas.mouseOver(() => {
+            isMouseIn = true;
+        });
+        canvas.mouseOut(() => {
+            isMouseIn = false;
+        });
+        init();
+    };
+
+    p5.windowResized = () => {
+        init();
+        p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+    };
+
+    p5.draw = () => {
+        p5.background(BG_COLOR);
+        circles.forEach((circle) => circle.draw(p5));
+        circles.forEach((circle) => circle.update(p5, isMouseIn));
+        customCursor.draw(p5, isMouseIn);
+    };
+};
+
 export default function ABitSquared() {
     return (
         <>
             <PieceLayout id={1}>
-                <P5Sketch getSketchDefinition={getSketchDefinition} />
+                <P5Sketch sketchDefinition={sketchDefinition} />
             </PieceLayout>
         </>
     );
-}
-
-function getSketchDefinition(size: { width: number; height: number }) {
-    if (!size.width || !size.height) {
-        return null;
-    }
-    const halfBall = BALL_SIZE / 2;
-    const container = new Bounds(
-        -halfBall,
-        size.width + halfBall,
-        -halfBall,
-        size.height + halfBall
-    );
-    const circles = new Array(TOTAL_BALLS)
-        .fill(0)
-        .map(() => new CircleInSketch({ containedIn: container }));
-
-    const customCursor = new CustomCursor();
-
-    let isMouseIn = true;
-
-    const sketchDefinition = (p5: P5) => {
-        p5.disableFriendlyErrors = true;
-
-        p5.setup = () => {
-            const canvas = p5.createCanvas(size.width, size.height);
-            p5.noCursor();
-            canvas.mouseOver(() => {
-                isMouseIn = true;
-            });
-            canvas.mouseOut(() => {
-                isMouseIn = false;
-            });
-        };
-
-        p5.draw = () => {
-            p5.background(BG_COLOR);
-            circles.forEach((circle) => circle.draw(p5));
-            circles.forEach((circle) => circle.update(p5, isMouseIn));
-            customCursor.draw(p5, isMouseIn);
-        };
-    };
-    return sketchDefinition;
 }
 
 class CircleInSketch {
