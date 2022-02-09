@@ -2,6 +2,7 @@ import type P5 from 'p5';
 // import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
+import { random } from 'lodash';
 
 export default function PieceName() {
     return (
@@ -12,6 +13,9 @@ export default function PieceName() {
 }
 
 const DOWNSCALE_RATIO = 1;
+const POINTS_PER_FRAME = 20;
+const MIN_POINT_SIZE = 3;
+const MAX_POINT_SIZE = 20;
 
 const sketchDefinition = (p5: P5) => {
     p5.disableFriendlyErrors = true;
@@ -25,16 +29,22 @@ const sketchDefinition = (p5: P5) => {
 
     p5.setup = () => {
         p5.createCanvas(p5.windowWidth, p5.windowHeight);
-        drawImageInBG();
+        createResizedSourceImage(false);
         // p5.noLoop();
     };
 
     p5.windowResized = () => {
         p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-        drawImageInBG();
+        createResizedSourceImage(false);
     };
 
     p5.draw = () => {
+        for (let i = 0; i < POINTS_PER_FRAME; i++) {
+            paintRandomPoint();
+        }
+    };
+
+    function paintRandomPoint() {
         p5.noStroke();
         const pixelToDraw = {
             x: Math.random(),
@@ -47,10 +57,14 @@ const sketchDefinition = (p5: P5) => {
         const color = getColorAt(pixelToDraw.x, pixelToDraw.y);
         p5.fill(color[0], color[1], color[2]);
 
-        p5.circle(pixelInScreen.x, pixelInScreen.y, 20);
-    };
+        p5.circle(
+            pixelInScreen.x,
+            pixelInScreen.y,
+            random(MIN_POINT_SIZE, MAX_POINT_SIZE)
+        );
+    }
 
-    function drawImageInBG() {
+    function createResizedSourceImage(shouldDraw: boolean) {
         p5.background('#fff');
         p5.imageMode(p5.CENTER);
         const imageRatio = originalImage.height / originalImage.width;
@@ -91,7 +105,7 @@ const sketchDefinition = (p5: P5) => {
             height: p5.windowHeight / DOWNSCALE_RATIO,
             width: p5.windowWidth / DOWNSCALE_RATIO,
         };
-        const resizedImage = p5.createImage(
+        resizedImage = p5.createImage(
             resizedImageSize.width,
             resizedImageSize.height
         );
@@ -106,15 +120,16 @@ const sketchDefinition = (p5: P5) => {
             resizedImageSize.width,
             resizedImageSize.height
         );
-
-        p5.image(
-            resizedImage,
-            p5.windowWidth / 2,
-            p5.windowHeight / 2,
-            p5.windowWidth,
-            p5.windowHeight
-        );
         resizedImage.loadPixels();
+        if (shouldDraw) {
+            p5.image(
+                resizedImage,
+                p5.windowWidth / 2,
+                p5.windowHeight / 2,
+                p5.windowWidth,
+                p5.windowHeight
+            );
+        }
     }
 
     function getColorAt(x: number, y: number) {
