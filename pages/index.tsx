@@ -26,6 +26,11 @@ export default function Index() {
                             <a>3. {pieces[3].title}</a>
                         </Link>
                     </li>
+                    <li>
+                        <Link href="/pieces/4-aproxigraphy">
+                            <a>4. {pieces[4].title}</a>
+                        </Link>
+                    </li>
                 </ul>
             </div>
         </>

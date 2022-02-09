@@ -11,4 +11,8 @@ export const pieces = {
         title: 'Spiraling',
         description: 'Fibonacci spirals',
     },
+    4: {
+        title: 'Aproxigraphy',
+        description: 'Aproximating a photo with shapes',
+    },
 };
