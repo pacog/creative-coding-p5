@@ -15,4 +15,8 @@ export const pieces = {
         title: 'Aproxigraphy',
         description: 'Aproximating a photo with shapes',
     },
+    5: {
+        title: 'Lines? Lines!',
+        description: 'Lines auto creating art',
+    },
 };
