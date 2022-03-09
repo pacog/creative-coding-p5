@@ -1,8 +1,9 @@
 import type P5 from 'p5';
-import P5Sketch from 'components/P5Sketch';
-import PieceLayout from 'components/PieceLayout';
 import { random, sample } from 'lodash';
 import { Bounds, Point } from '@mathigon/euclid';
+import chroma from 'chroma-js';
+import P5Sketch from 'components/P5Sketch';
+import PieceLayout from 'components/PieceLayout';
 
 export default function PieceName() {
     return (
@@ -63,18 +64,13 @@ const POSSIBLE_DIRECTIONS = [
     new Point(0, -1),
     new Point(-1, 0),
 ];
-const COLORS = [
-    '#f94144',
-    '#f3722c',
-    '#f8961e',
-    '#f9844a',
-    '#f9c74f',
-    '#90be6d',
-    '#43aa8b',
-    '#4d908e',
-    '#577590',
-    '#277da1',
-];
+const COLORS = chroma.scale([
+    '#000814',
+    '#001d3d',
+    '#003566',
+    '#ffc300',
+    '#ffd60a',
+]);
 
 class LineCreator {
     private position: Point;
@@ -86,7 +82,7 @@ class LineCreator {
         MAX_CHANCE_OF_CHANGING_DIRECTION,
         true
     );
-    private color = sample(COLORS);
+    private color = COLORS(Math.random()).rgb(true);
 
     constructor(screenBounds: Bounds) {
         this.position = Point.random(screenBounds);
@@ -103,7 +99,7 @@ class LineCreator {
         const newPosition = this.position.add(deltaPosition);
         p5.noStroke();
         p5.strokeCap(p5.PROJECT);
-        p5.stroke(this.color);
+        p5.stroke(...this.color);
         p5.strokeWeight(this.size);
         p5.line(
             Math.round(this.position.x),
