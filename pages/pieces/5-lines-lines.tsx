@@ -1,5 +1,4 @@
 import type P5 from 'p5';
-// import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import { random, sample } from 'lodash';
@@ -13,7 +12,7 @@ export default function PieceName() {
     );
 }
 
-const TOTAL_LINE_CREATORS = 20;
+const TOTAL_LINE_CREATORS = 5;
 
 const sketchDefinition = (p5: P5) => {
     p5.disableFriendlyErrors = true;
@@ -54,8 +53,8 @@ const sketchDefinition = (p5: P5) => {
 
 const MIN_SIZE = 5;
 const MAX_SIZE = 100;
-const MIN_SPEED = 20; // px per second
-const MAX_SPEED = 90; // px per second
+const MIN_SPEED = 80; // px per second
+const MAX_SPEED = 1000; // px per second
 const MIN_CHANCE_OF_CHANGING_DIRECTION = 1 / (60 * 4);
 const MAX_CHANCE_OF_CHANGING_DIRECTION = 1 / (60 * 2);
 const POSSIBLE_DIRECTIONS = [
@@ -75,23 +74,12 @@ const COLORS = [
     '#4d908e',
     '#577590',
     '#277da1',
-
-    // '#ff0000',
-    // '#ff8700',
-    // '#ffd300',
-    // '#deff0a',
-    // '#a1ff0a',
-    // '#0aff99',
-    // '#0aefff',
-    // '#147df5',
-    // '#580aff',
-    // '#be0aff',
 ];
 
 class LineCreator {
     private position: Point;
     private size = random(MIN_SIZE, MAX_SIZE, false);
-    private direction: Point;
+    private direction: number;
     private speed = random(MIN_SPEED, MAX_SPEED, true);
     private chanceOfChangingDirection = random(
         MIN_CHANCE_OF_CHANGING_DIRECTION,
@@ -102,13 +90,13 @@ class LineCreator {
 
     constructor(screenBounds: Bounds) {
         this.position = Point.random(screenBounds);
-        this.direction = sample(POSSIBLE_DIRECTIONS);
+        this.direction = random(0, POSSIBLE_DIRECTIONS.length - 1, false);
     }
 
     paintAndUpdate(p5: P5) {
         const deltaSeconds = p5.deltaTime / 1000;
         this.changeDirectionRandomly();
-        const deltaPosition = this.direction.scale(
+        const deltaPosition = POSSIBLE_DIRECTIONS[this.direction].scale(
             this.speed * deltaSeconds,
             this.speed * deltaSeconds
         );
@@ -132,7 +120,12 @@ class LineCreator {
 
     private changeDirectionRandomly() {
         if (Math.random() < this.chanceOfChangingDirection) {
-            this.direction = sample(POSSIBLE_DIRECTIONS);
+            const directionChange = Math.random() > 0.5 ? 1 : -1;
+            this.direction =
+                (this.direction + directionChange) % POSSIBLE_DIRECTIONS.length;
+            if (this.direction < 0) {
+                this.direction += POSSIBLE_DIRECTIONS.length;
+            }
         }
     }
 }
