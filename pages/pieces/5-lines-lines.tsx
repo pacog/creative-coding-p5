@@ -60,9 +60,13 @@ const MIN_CHANCE_OF_CHANGING_DIRECTION = 1 / (60 * 4);
 const MAX_CHANCE_OF_CHANGING_DIRECTION = 1 / (60 * 2);
 const POSSIBLE_DIRECTIONS = [
     new Point(0, 1),
+    new Point(1, 1),
     new Point(1, 0),
+    new Point(1, -1),
     new Point(0, -1),
+    new Point(-1, -1),
     new Point(-1, 0),
+    new Point(-1, 1),
 ];
 const COLORS = chroma.scale([
     '#000814',
@@ -92,21 +96,17 @@ class LineCreator {
     paintAndUpdate(p5: P5) {
         const deltaSeconds = p5.deltaTime / 1000;
         this.changeDirectionRandomly();
+
         const deltaPosition = POSSIBLE_DIRECTIONS[this.direction].scale(
             this.speed * deltaSeconds,
             this.speed * deltaSeconds
         );
         const newPosition = this.position.add(deltaPosition);
-        p5.noStroke();
-        p5.strokeCap(p5.PROJECT);
+        p5.strokeCap(p5.ROUND);
+
         p5.stroke(...this.color);
         p5.strokeWeight(this.size);
-        p5.line(
-            Math.round(this.position.x),
-            Math.round(this.position.y),
-            Math.round(newPosition.x),
-            Math.round(newPosition.y)
-        );
+        p5.line(this.position.x, this.position.y, newPosition.x, newPosition.y);
         this.position = newPosition;
     }
 
@@ -122,6 +122,8 @@ class LineCreator {
             if (this.direction < 0) {
                 this.direction += POSSIBLE_DIRECTIONS.length;
             }
+            return true;
         }
+        return false;
     }
 }
