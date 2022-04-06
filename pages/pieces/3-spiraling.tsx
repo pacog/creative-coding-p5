@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Bounds, Point, Rectangle } from '@mathigon/euclid';
 import type P5 from 'p5';
 import chroma from 'chroma-js';
@@ -5,17 +6,52 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import { project } from 'utils/number';
 import { random } from 'lodash';
+import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
+
+const SPIRALS_PER_GROUP = 3;
+
+interface ISketchParams {
+    groups: number;
+    spiralsPerGroup: number;
+}
+
+const paramsConfig = [
+    {
+        name: 'groups',
+        min: 1,
+        max: 20,
+        step: 1,
+        defaultValue: 5,
+    },
+    {
+        name: 'spiralsPerGroup',
+        min: 1,
+        max: 10,
+        step: 1,
+        defaultValue: 3,
+    },
+];
 
 export default function RandomFractals() {
+    const [params, setParams] = useState<ISketchParams>(
+        getInitialParamsValue(paramsConfig) as ISketchParams
+    );
+
     return (
-        <PieceLayout id={3}>
-            <P5Sketch sketchDefinition={sketchDefinition} />
+        <PieceLayout
+            id={3}
+            tools={
+                <SketchParams<ISketchParams>
+                    paramConfig={paramsConfig}
+                    onChange={(newVal) => setParams(newVal)}
+                />
+            }
+        >
+            <P5Sketch sketchDefinition={getSketchDefinition(params)} />
         </PieceLayout>
     );
 }
 
-const SPIRALS_PER_GROUP = 3;
-const GROUPS = 5;
 const MIN_START = 1;
 const MAX_START = 2;
 
@@ -29,34 +65,44 @@ const SCALES = [
     chroma.scale(['#74c69d', '#40916c']),
 ];
 
-const sketchDefinition = (p5: P5) => {
-    p5.disableFriendlyErrors = true;
+const getSketchDefinition = (params: ISketchParams) => {
+    return (p5: P5) => {
+        p5.disableFriendlyErrors = true;
 
-    p5.setup = () => {
-        p5.createCanvas(p5.windowWidth, p5.windowHeight);
-        p5.noLoop();
-    };
+        p5.setup = () => {
+            p5.createCanvas(p5.windowWidth, p5.windowHeight);
+            p5.noLoop();
+        };
 
-    p5.windowResized = () => {
-        p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-    };
+        p5.windowResized = () => {
+            p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+        };
 
-    p5.draw = () => {
-        p5.background('#fff');
-        for (let i = 0; i < GROUPS; i++) {
-            drawSpiralGroup(p5, SCALES[i % SCALES.length]);
-        }
+        p5.draw = () => {
+            p5.background('#fff');
+            for (let i = 0; i < params.groups; i++) {
+                drawSpiralGroup(
+                    p5,
+                    SCALES[i % SCALES.length],
+                    params.spiralsPerGroup
+                );
+            }
+        };
     };
 };
 
-function drawSpiralGroup(p5: P5, scale: chroma.Scale<chroma.Color>) {
+function drawSpiralGroup(
+    p5: P5,
+    scale: chroma.Scale<chroma.Color>,
+    spiralsInGroup: number
+) {
     const bounds = getRandomBounds(p5);
-    for (let i = 0; i < SPIRALS_PER_GROUP; i++) {
+    for (let i = 0; i < spiralsInGroup; i++) {
         const initialPoint = Point.random(bounds);
         drawSpiral(
             p5,
-            project(i, 0, SPIRALS_PER_GROUP, MIN_START, MAX_START),
-            scale(project(i, 0, SPIRALS_PER_GROUP, 0, 1)),
+            project(i, 0, spiralsInGroup, MIN_START, MAX_START),
+            scale(project(i, 0, spiralsInGroup, 0, 1)),
             initialPoint,
             random(0, 3, false)
         );
