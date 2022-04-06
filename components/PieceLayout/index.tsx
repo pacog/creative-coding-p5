@@ -7,9 +7,10 @@ import styles from './style.module.css';
 interface PieceLayoutProps {
     children: React.ReactNode;
     id: number;
+    tools?: React.ReactNode;
 }
 
-export default function PieceLayout({ children, id }: PieceLayoutProps) {
+export default function PieceLayout({ children, id, tools }: PieceLayoutProps) {
     const title = pieces[id].title;
     const description = pieces[id].description;
 
@@ -24,24 +25,28 @@ export default function PieceLayout({ children, id }: PieceLayoutProps) {
             </Head>
             <div className={styles.Container}>
                 <div className={styles.Header}>
-                    <Link href="/">
-                        <a className={styles.HeaderLink}>
-                            <div className={styles.HeaderLinkIcon}>
-                                <Image
-                                    src="/icons/arrow_back_icon.svg"
-                                    height={32}
-                                    width={32}
-                                    alt="Back"
-                                />
+                    <div className={styles.HeaderNavigation}>
+                        <Link href="/">
+                            <a className={styles.HeaderLink}>
+                                <div className={styles.HeaderLinkIcon}>
+                                    <Image
+                                        src="/icons/arrow_back_icon.svg"
+                                        height={32}
+                                        width={32}
+                                        alt="Back"
+                                    />
+                                </div>
+                            </a>
+                        </Link>
+                        <div className={styles.HeaderText}>
+                            <div className={styles.HeaderTitle}>{title}</div>
+                            <div className={styles.HeaderDescription}>
+                                {description}
                             </div>
-                        </a>
-                    </Link>
-                    <div className={styles.HeaderText}>
-                        <div className={styles.HeaderTitle}>{title}</div>
-                        <div className={styles.HeaderDescription}>
-                            {description}
                         </div>
                     </div>
+
+                    {tools && <div className={styles.HeaderTools}>{tools}</div>}
                 </div>
                 {children}
             </div>

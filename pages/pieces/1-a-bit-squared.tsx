@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type P5 from 'p5';
 import { Line, Point, Bounds, Circle } from '@mathigon/euclid';
 import { now, random } from 'lodash';
@@ -7,7 +7,6 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import { keepNumberInside, project } from 'utils/number';
 
-const BALL_SIZE = 40;
 const TOTAL_BALLS = 1000;
 const MIN_BALL_SPEED = 30;
 const MAX_BALL_SPEED = 100;
@@ -29,58 +28,87 @@ const COLOR_SCALE = chroma.scale([
 
 let isMouseIn = true;
 
-const sketchDefinition = (p5: P5) => {
-    p5.disableFriendlyErrors = true;
+interface ISketchParams {
+    ballSize: number;
+}
 
-    const halfBall = BALL_SIZE / 2;
-    let container: Bounds;
-    let circles: CircleInSketch[];
-    let customCursor: CustomCursor;
+const getSketchDefinition = (params: ISketchParams) => {
+    console.log('creating sketch', { params });
+    return (p5: P5) => {
+        p5.disableFriendlyErrors = true;
 
-    function init() {
-        container = new Bounds(
-            -halfBall,
-            p5.windowWidth + halfBall,
-            -halfBall,
-            p5.windowHeight + halfBall
-        );
-        circles = new Array(TOTAL_BALLS)
-            .fill(0)
-            .map(() => new CircleInSketch({ containedIn: container }));
+        const halfBall = params.ballSize / 2;
+        let container: Bounds;
+        let circles: CircleInSketch[];
+        let customCursor: CustomCursor;
 
-        customCursor = new CustomCursor();
-    }
+        function init() {
+            container = new Bounds(
+                -halfBall,
+                p5.windowWidth + halfBall,
+                -halfBall,
+                p5.windowHeight + halfBall
+            );
+            circles = new Array(TOTAL_BALLS)
+                .fill(0)
+                .map(
+                    () => new CircleInSketch({ containedIn: container, params })
+                );
 
-    p5.setup = () => {
-        const canvas = p5.createCanvas(p5.windowWidth, p5.windowHeight);
-        p5.noCursor();
-        canvas.mouseOver(() => {
-            isMouseIn = true;
-        });
-        canvas.mouseOut(() => {
-            isMouseIn = false;
-        });
-        init();
-    };
+            customCursor = new CustomCursor();
+        }
 
-    p5.windowResized = () => {
-        init();
-        p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-    };
+        p5.setup = () => {
+            const canvas = p5.createCanvas(p5.windowWidth, p5.windowHeight);
+            p5.noCursor();
+            canvas.mouseOver(() => {
+                isMouseIn = true;
+            });
+            canvas.mouseOut(() => {
+                isMouseIn = false;
+            });
+            init();
+        };
 
-    p5.draw = () => {
-        p5.background(BG_COLOR);
-        circles.forEach((circle) => circle.draw(p5));
-        circles.forEach((circle) => circle.update(p5, isMouseIn));
-        customCursor.draw(p5, isMouseIn);
+        p5.windowResized = () => {
+            init();
+            p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+        };
+
+        p5.draw = () => {
+            p5.background(BG_COLOR);
+            circles.forEach((circle) => circle.draw(p5));
+            circles.forEach((circle) => circle.update(p5, isMouseIn));
+            customCursor.draw(p5, isMouseIn);
+        };
     };
 };
 
 export default function ABitSquared() {
+    const [params, setParams] = useState<ISketchParams>({ ballSize: 40 });
+
     return (
         <>
-            <PieceLayout id={1}>
-                <P5Sketch sketchDefinition={sketchDefinition} />
+            <PieceLayout
+                id={1}
+                tools={
+                    <div>
+                        <input
+                            type="range"
+                            min={1}
+                            max={200}
+                            value={params.ballSize}
+                            onChange={(e) =>
+                                setParams((old) => ({
+                                    ...old,
+                                    ballSize: parseFloat(e.target.value),
+                                }))
+                            }
+                        />
+                    </div>
+                }
+            >
+                <P5Sketch sketchDefinition={getSketchDefinition(params)} />
             </PieceLayout>
         </>
     );
@@ -95,8 +123,16 @@ class CircleInSketch {
     private originalColorInScale: number;
     private colorInScale: number;
     private lastCollision: number;
+    private params: ISketchParams;
 
-    constructor({ containedIn }: { containedIn: Bounds }) {
+    constructor({
+        containedIn,
+        params,
+    }: {
+        containedIn: Bounds;
+        params: ISketchParams;
+    }) {
+        this.params = params;
         this.containedIn = containedIn;
         this.position = Point.random(this.containedIn);
         this.defaultSpeed = random(MIN_BALL_SPEED, MAX_BALL_SPEED, true);
@@ -111,7 +147,7 @@ class CircleInSketch {
         p5.noStroke();
         const color = COLOR_SCALE(this.colorInScale).rgb();
         p5.fill(color[0], color[1], color[2], 200);
-        p5.square(this.position.x, this.position.y, BALL_SIZE);
+        p5.square(this.position.x, this.position.y, this.params.ballSize);
     }
 
     update(p5: P5, isMouseIn: boolean) {
