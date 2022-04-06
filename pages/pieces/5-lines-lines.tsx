@@ -8,7 +8,7 @@ import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 
 interface ISketchParams {
-    lineCreators: number; // seconds
+    lineCreators: number;
     minWidth: number;
     maxWidth: number;
     minSpeed: number;
