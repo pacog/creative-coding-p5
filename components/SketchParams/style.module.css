@@ -1,0 +1,21 @@
+.Param {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 49px;
+}
+.ParamLabel {
+    min-width: 100px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    color: white;
+    font-size: 12px;
+}
+.ParamLabel:last-of-type {
+    margin-bottom: 0;
+}
+
+.ParamValue {
+    min-width: 100px;
+    display: block;
+}

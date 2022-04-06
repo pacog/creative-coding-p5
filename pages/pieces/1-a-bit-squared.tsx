@@ -6,6 +6,7 @@ import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import { keepNumberInside, project } from 'utils/number';
+import SketchParams from 'components/SketchParams';
 
 const TOTAL_BALLS = 1000;
 const MIN_BALL_SPEED = 30;
@@ -33,8 +34,7 @@ interface ISketchParams {
 }
 
 const getSketchDefinition = (params: ISketchParams) => {
-    console.log('creating sketch', { params });
-    return (p5: P5) => {
+    const sketch = (p5: P5) => {
         p5.disableFriendlyErrors = true;
 
         const halfBall = params.ballSize / 2;
@@ -82,7 +82,18 @@ const getSketchDefinition = (params: ISketchParams) => {
             customCursor.draw(p5, isMouseIn);
         };
     };
+    return sketch;
 };
+
+const paramsConfig = [
+    {
+        name: 'ballSize',
+        min: 1,
+        max: 200,
+        step: 1,
+        defaultValue: 40,
+    },
+];
 
 export default function ABitSquared() {
     const [params, setParams] = useState<ISketchParams>({ ballSize: 40 });
@@ -92,20 +103,10 @@ export default function ABitSquared() {
             <PieceLayout
                 id={1}
                 tools={
-                    <div>
-                        <input
-                            type="range"
-                            min={1}
-                            max={200}
-                            value={params.ballSize}
-                            onChange={(e) =>
-                                setParams((old) => ({
-                                    ...old,
-                                    ballSize: parseFloat(e.target.value),
-                                }))
-                            }
-                        />
-                    </div>
+                    <SketchParams<ISketchParams>
+                        paramConfig={paramsConfig}
+                        onChange={(newVal) => setParams(newVal)}
+                    />
                 }
             >
                 <P5Sketch sketchDefinition={getSketchDefinition(params)} />
