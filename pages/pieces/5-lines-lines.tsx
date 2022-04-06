@@ -1,63 +1,138 @@
+import { useState } from 'react';
 import type P5 from 'p5';
-import { random, sample } from 'lodash';
+import { random } from 'lodash';
 import { Bounds, Point } from '@mathigon/euclid';
 import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
+import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
+
+interface ISketchParams {
+    lineCreators: number; // seconds
+    minWidth: number;
+    maxWidth: number;
+    minSpeed: number;
+    maxSpeed: number;
+    minFreqChangeDirection: number;
+    maxFreqChangeDirection: number;
+}
+const paramsConfig = [
+    {
+        name: 'lineCreators',
+        min: 1,
+        max: 20,
+        step: 1,
+        defaultValue: 5,
+    },
+    {
+        name: 'minWidth',
+        min: 5,
+        max: 200,
+        step: 5,
+        defaultValue: 5,
+    },
+    {
+        name: 'maxWidth',
+        min: 5,
+        max: 200,
+        step: 5,
+        defaultValue: 100,
+    },
+    {
+        name: 'minSpeed',
+        min: 10,
+        max: 2000,
+        step: 10,
+        defaultValue: 80,
+    },
+    {
+        name: 'maxSpeed',
+        min: 10,
+        max: 2000,
+        step: 10,
+        defaultValue: 1000,
+    },
+    {
+        name: 'minFreqChangeDirection',
+        min: 1,
+        max: 50,
+        step: 1,
+        defaultValue: 2,
+    },
+    {
+        name: 'maxFreqChangeDirection',
+        min: 1,
+        max: 50,
+        step: 1,
+        defaultValue: 4,
+    },
+];
 
 export default function PieceName() {
+    const [params, setParams] = useState<ISketchParams>(
+        getInitialParamsValue(paramsConfig) as ISketchParams
+    );
+
     return (
-        <PieceLayout id={5}>
-            <P5Sketch sketchDefinition={sketchDefinition} />
+        <PieceLayout
+            id={5}
+            tools={
+                <SketchParams<ISketchParams>
+                    paramConfig={paramsConfig}
+                    onChange={(newVal) => setParams(newVal)}
+                />
+            }
+        >
+            <P5Sketch sketchDefinition={getSketchDefinition(params)} />
         </PieceLayout>
     );
 }
 
-const TOTAL_LINE_CREATORS = 5;
+const getSketchDefinition = (params: ISketchParams) => {
+    return (p5: P5) => {
+        p5.disableFriendlyErrors = true;
 
-const sketchDefinition = (p5: P5) => {
-    p5.disableFriendlyErrors = true;
+        let lineCreators: LineCreator[] = [];
 
-    let lineCreators: LineCreator[] = [];
+        p5.setup = () => {
+            p5.createCanvas(p5.windowWidth, p5.windowHeight);
+        };
 
-    p5.setup = () => {
-        p5.createCanvas(p5.windowWidth, p5.windowHeight);
-    };
+        p5.windowResized = () => {
+            p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+        };
 
-    p5.windowResized = () => {
-        p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-    };
+        p5.draw = () => {
+            createLineCreatorsIfNeeded();
+            lineCreators.forEach((creator) => creator.paintAndUpdate(p5));
+            destroyLineCreatorsOutside();
+        };
 
-    p5.draw = () => {
-        createLineCreatorsIfNeeded();
-        lineCreators.forEach((creator) => creator.paintAndUpdate(p5));
-        destroyLineCreatorsOutside();
-    };
+        function createLineCreatorsIfNeeded() {
+            while (lineCreators.length < params.lineCreators) {
+                lineCreators.push(
+                    new LineCreator(
+                        new Bounds(0, p5.windowWidth, 0, p5.windowHeight),
+                        params
+                    )
+                );
+            }
+        }
 
-    function createLineCreatorsIfNeeded() {
-        while (lineCreators.length < TOTAL_LINE_CREATORS) {
-            lineCreators.push(
-                new LineCreator(
-                    new Bounds(0, p5.windowWidth, 0, p5.windowHeight)
-                )
+        function destroyLineCreatorsOutside() {
+            const currentBounds = new Bounds(
+                0,
+                p5.windowWidth,
+                0,
+                p5.windowHeight
+            );
+            lineCreators = lineCreators.filter((creator) =>
+                creator.isInsideBounds(currentBounds)
             );
         }
-    }
-
-    function destroyLineCreatorsOutside() {
-        const currentBounds = new Bounds(0, p5.windowWidth, 0, p5.windowHeight);
-        lineCreators = lineCreators.filter((creator) =>
-            creator.isInsideBounds(currentBounds)
-        );
-    }
+    };
 };
 
-const MIN_SIZE = 5;
-const MAX_SIZE = 100;
-const MIN_SPEED = 80; // px per second
-const MAX_SPEED = 1000; // px per second
-const MIN_CHANCE_OF_CHANGING_DIRECTION = 1 / (60 * 4);
-const MAX_CHANCE_OF_CHANGING_DIRECTION = 1 / (60 * 2);
 const POSSIBLE_DIRECTIONS = [
     new Point(0, 1),
     new Point(1, 1),
@@ -78,19 +153,22 @@ const COLORS = chroma.scale([
 
 class LineCreator {
     private position: Point;
-    private size = random(MIN_SIZE, MAX_SIZE, false);
+    private size: number;
     private direction: number;
-    private speed = random(MIN_SPEED, MAX_SPEED, true);
-    private chanceOfChangingDirection = random(
-        MIN_CHANCE_OF_CHANGING_DIRECTION,
-        MAX_CHANCE_OF_CHANGING_DIRECTION,
-        true
-    );
+    private speed: number;
+    private chanceOfChangingDirection: number;
     private color = COLORS(Math.random()).rgb(true);
 
-    constructor(screenBounds: Bounds) {
+    constructor(screenBounds: Bounds, params: ISketchParams) {
         this.position = Point.random(screenBounds);
         this.direction = random(0, POSSIBLE_DIRECTIONS.length - 1, false);
+        this.size = random(params.minWidth, params.maxWidth, false);
+        this.speed = random(params.minSpeed, params.maxSpeed, true);
+        this.chanceOfChangingDirection = random(
+            params.minFreqChangeDirection / 400,
+            params.maxFreqChangeDirection / 400,
+            true
+        );
     }
 
     paintAndUpdate(p5: P5) {
