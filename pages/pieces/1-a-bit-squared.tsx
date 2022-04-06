@@ -89,7 +89,7 @@ const paramsConfig = [
     {
         name: 'ballSize',
         min: 1,
-        max: 200,
+        max: 60,
         step: 1,
         defaultValue: 40,
     },

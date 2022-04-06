@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useThrottle } from 'react-use';
 import styles from './style.module.css';
 
 interface IParamConfig {
@@ -12,13 +13,19 @@ interface IParamConfig {
 interface ISketchParamsProps<ParamsType> {
     paramConfig: IParamConfig[];
     onChange: (newValue: ParamsType) => void;
+    throttleTime?: number;
 }
 
 export default function SketchParams<ParamsType>({
     paramConfig,
     onChange,
+    throttleTime = 300,
 }: ISketchParamsProps<ParamsType>) {
     const [values, setValues] = useState(getInitialParamsValue(paramConfig));
+    const throttledValues = useThrottle(values, throttleTime);
+    useEffect(() => {
+        onChange(throttledValues as ParamsType);
+    }, [onChange, throttledValues]);
 
     return (
         <div>
@@ -37,9 +44,11 @@ export default function SketchParams<ParamsType>({
                                 ...old,
                                 [param.name]: parseFloat(ev.target.value),
                             }));
-                            onChange(values as ParamsType);
                         }}
                     />
+                    <div className={styles.ParamPreview}>
+                        ({values[param.name].toFixed(2)})
+                    </div>
                 </div>
             ))}
         </div>
