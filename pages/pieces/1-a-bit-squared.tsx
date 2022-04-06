@@ -6,9 +6,8 @@ import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import { keepNumberInside, project } from 'utils/number';
-import SketchParams from 'components/SketchParams';
+import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 
-const TOTAL_BALLS = 1000;
 const MIN_BALL_SPEED = 30;
 const MAX_BALL_SPEED = 100;
 const DISTANCE_TO_MOUSE = 100;
@@ -31,6 +30,7 @@ let isMouseIn = true;
 
 interface ISketchParams {
     ballSize: number;
+    totalBalls: number;
 }
 
 const getSketchDefinition = (params: ISketchParams) => {
@@ -49,7 +49,7 @@ const getSketchDefinition = (params: ISketchParams) => {
                 -halfBall,
                 p5.windowHeight + halfBall
             );
-            circles = new Array(TOTAL_BALLS)
+            circles = new Array(params.totalBalls)
                 .fill(0)
                 .map(
                     () => new CircleInSketch({ containedIn: container, params })
@@ -93,10 +93,19 @@ const paramsConfig = [
         step: 1,
         defaultValue: 40,
     },
+    {
+        name: 'totalBalls',
+        min: 100,
+        max: 5000,
+        step: 100,
+        defaultValue: 1000,
+    },
 ];
 
 export default function ABitSquared() {
-    const [params, setParams] = useState<ISketchParams>({ ballSize: 40 });
+    const [params, setParams] = useState<ISketchParams>(
+        getInitialParamsValue(paramsConfig) as ISketchParams
+    );
 
     return (
         <>

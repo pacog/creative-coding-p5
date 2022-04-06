@@ -55,7 +55,7 @@ export default function SketchParams<ParamsType>({
     );
 }
 
-function getInitialParamsValue(paramConfig: IParamConfig[]) {
+export function getInitialParamsValue(paramConfig: IParamConfig[]) {
     return paramConfig.reduce((acc, eachParam) => {
         return {
             ...acc,
