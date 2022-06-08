@@ -18,7 +18,7 @@ const paramsConfig = [
         min: 1,
         max: 40,
         step: 1,
-        defaultValue: 5,
+        defaultValue: 7,
     },
     {
         name: 'paintEveryMs',
@@ -100,7 +100,6 @@ const getSketchDefinition = (params: ISketchParams) => {
                 y: (p5.windowHeight - game.size.height * params.cellSizePx) / 2,
             };
             game.forEachCell((row, column, value) => {
-                // TODO only draw every X;
                 if (value) {
                     p5.fill(0, 0, 0);
                     p5.square(
@@ -125,7 +124,6 @@ class GameOfLife {
         for (let row = 0; row < newCells.size.height; row++) {
             for (let column = 0; column < newCells.size.width; column++) {
                 this.cells.setVal(row, column, Math.random() < initialChance);
-                // this.cells.setVal(row, column, false);
             }
         }
     }

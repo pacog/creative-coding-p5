@@ -8,16 +8,15 @@ export function shouldNextCellBeAlive<T>(
     let liveCellsAround = 0;
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
-            if (j === 0 && i === 0) {
-                break;
-            }
-            if (matrix.getValWrapped(row + i, column + j)) {
-                liveCellsAround += 1;
+            if (j !== 0 || i !== 0) {
+                if (matrix.getValWrapped(row + i, column + j)) {
+                    liveCellsAround += 1;
+                }
             }
         }
     }
 
-    const liveCell = matrix.getValWrapped(0, 0);
+    const liveCell = matrix.getValWrapped(row, column);
     if (liveCell) {
         // Any live cell with fewer than two live neighbours dies, as if by underpopulation.
         // Any live cell with two or three live neighbours lives on to the next generation.

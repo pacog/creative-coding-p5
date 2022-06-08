@@ -30,6 +30,17 @@ describe('shouldNextCellBeAlive', () => {
         expect(
             shouldNextCellBeAlive(
                 createFromValues([
+                    [false, false, false],
+                    [true, true, true],
+                    [false, false, false],
+                ]),
+                1,
+                1
+            )
+        ).toBe(true);
+        expect(
+            shouldNextCellBeAlive(
+                createFromValues([
                     [true, false, true],
                     [false, true, false],
                     [false, false, false],
@@ -38,6 +49,7 @@ describe('shouldNextCellBeAlive', () => {
                 1
             )
         ).toBe(true);
+
         expect(
             shouldNextCellBeAlive(
                 createFromValues([
