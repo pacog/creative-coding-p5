@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type P5 from 'p5';
-// import chroma from 'chroma-js';
+import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
@@ -35,6 +35,19 @@ const paramsConfig = [
         defaultValue: 0.1,
     },
 ];
+
+const scale = chroma.scale(
+    [
+        '#007f5f',
+        '#2b9348',
+        '#55a630',
+        '#80b918',
+        '#aacc00',
+        '#bfd200',
+        '#d4d700',
+        '#dddf00',
+    ].reverse()
+);
 
 export default function GameOfLifeComponent() {
     const [params, setParams] = useState<ISketchParams>(
@@ -99,9 +112,14 @@ const getSketchDefinition = (params: ISketchParams) => {
                 x: (p5.windowWidth - game.size.width * params.cellSizePx) / 2,
                 y: (p5.windowHeight - game.size.height * params.cellSizePx) / 2,
             };
+            const now = new Date().getTime();
             game.forEachCell((row, column, value) => {
                 if (value) {
-                    p5.fill(0, 0, 0);
+                    const age = now - value.getTime();
+                    const OLD_AGE = 5000; // ms
+                    const ageRatio = Math.min(age / OLD_AGE, 1);
+                    const color = scale(ageRatio).rgb();
+                    p5.fill(...color);
                     p5.square(
                         column * params.cellSizePx + offset.x,
                         row * params.cellSizePx + offset.y,
@@ -114,23 +132,25 @@ const getSketchDefinition = (params: ISketchParams) => {
 };
 
 class GameOfLife {
-    private cells: Matrix<boolean>;
+    private cells: Matrix<Date>;
     private _size: { width: number; height: number };
 
     constructor(width: number, height: number, initialChance: number) {
         this._size = { width, height };
-        const newCells = new Matrix(width, height, false);
+        const newCells = new Matrix(width, height, null);
         this.cells = newCells;
         for (let row = 0; row < newCells.size.height; row++) {
             for (let column = 0; column < newCells.size.width; column++) {
-                this.cells.setVal(row, column, Math.random() < initialChance);
+                this.cells.setVal(
+                    row,
+                    column,
+                    Math.random() < initialChance ? new Date() : null
+                );
             }
         }
     }
 
-    forEachCell(
-        callback: (row: number, column: number, value: boolean) => void
-    ) {
+    forEachCell(callback: (row: number, column: number, value: Date) => void) {
         for (let column = 0; column < this.cells.size.width; column++) {
             for (let row = 0; row < this.cells.size.height; row++) {
                 callback(row, column, this.cells.getVal(row, column));
@@ -142,11 +162,12 @@ class GameOfLife {
         const newCells = new Matrix(
             this.cells.size.width,
             this.cells.size.height,
-            false
+            null
         );
-        this.forEachCell((row, column) => {
-            const nextValue = shouldNextCellBeAlive(this.cells, row, column);
-            newCells.setVal(row, column, nextValue);
+        this.forEachCell((row, column, oldValue) => {
+            if (shouldNextCellBeAlive(this.cells, row, column)) {
+                newCells.setVal(row, column, oldValue || new Date());
+            }
         });
         this.cells = newCells;
     }
