@@ -19,7 +19,8 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "test": "jest"
+        "test": "jest",
+        "test_cont": "jest --watch"
     },
     "browserslist": {
         "production": [
