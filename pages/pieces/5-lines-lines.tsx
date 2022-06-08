@@ -68,7 +68,7 @@ const paramsConfig = [
     },
 ];
 
-export default function PieceName() {
+export default function Lines() {
     const [params, setParams] = useState<ISketchParams>(
         getInitialParamsValue(paramsConfig) as ISketchParams
     );

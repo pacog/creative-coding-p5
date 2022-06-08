@@ -35,7 +35,7 @@ const paramsConfig = [
     },
 ];
 
-export default function PieceName() {
+export default function Aprox() {
     const [params, setParams] = useState<ISketchParams>(
         getInitialParamsValue(paramsConfig) as ISketchParams
     );
