@@ -19,4 +19,8 @@ export const pieces = {
         title: 'Lines? Lines!',
         description: 'Lines auto creating art',
     },
+    6: {
+        title: 'Game of life',
+        description: "Yet another Conway's game of life",
+    },
 };
