@@ -5,7 +5,7 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { Circle, Point } from '@mathigon/euclid';
-import { random, sample } from 'lodash';
+import { random, sample, shuffle } from 'lodash';
 
 interface ISketchParams {
     circles: number;
@@ -16,13 +16,7 @@ interface ISketchParams {
     rpm: number;
 }
 
-const scale = chroma.scale([
-    '#ff595e',
-    '#ffca3a',
-    '#8ac926',
-    '#1982c4',
-    '#6a4c93',
-]);
+const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'];
 
 const paramsConfig = [
     {
@@ -37,28 +31,28 @@ const paramsConfig = [
         min: 0.5,
         max: 1,
         step: 0.05,
-        defaultValue: 0.9,
+        defaultValue: 0.95,
     },
     {
         name: 'minBigCircleSize',
         min: 0.1,
         max: 0.45,
         step: 0.05,
-        defaultValue: 0.4,
+        defaultValue: 0.2,
     },
     {
         name: 'maxSmallCircleSize',
         min: 0.5,
         max: 1,
         step: 0.05,
-        defaultValue: 0.7,
+        defaultValue: 0.85,
     },
     {
         name: 'minSmallCircleSize',
         min: 0.1,
         max: 0.45,
         step: 0.05,
-        defaultValue: 0.4,
+        defaultValue: 0.2,
     },
     {
         name: 'rpm',
@@ -97,11 +91,11 @@ const getSketchDefinition = (params: ISketchParams) => {
         const updateEveryMs = 1000 / FPS;
 
         p5.disableFriendlyErrors = true;
-
+        const shuffled = shuffle(colors);
         function initCircles() {
             circles = Array(params.circles)
                 .fill(null)
-                .map(() => {
+                .map((_item, index) => {
                     const bigCircleSize = random(
                         params.minBigCircleSize,
                         params.maxBigCircleSize,
@@ -121,7 +115,7 @@ const getSketchDefinition = (params: ISketchParams) => {
                         ),
                         smallCircleSize,
                         new Point(random(0, 1, true), random(0, 1, true)),
-                        scale(random(0, 1, true))
+                        chroma(shuffled[index % shuffled.length])
                     );
                 });
         }
