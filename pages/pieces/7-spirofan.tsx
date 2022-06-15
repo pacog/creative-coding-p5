@@ -172,8 +172,12 @@ class SmallCircle {
     update(rotationRadians: number) {
         this.c = new Circle(
             new Point(
-                this.parentCircle.c.x + Math.sin(rotationRadians) * this.radius,
-                this.parentCircle.c.y - Math.cos(rotationRadians) * this.radius
+                this.parentCircle.c.x +
+                    Math.sin(rotationRadians) *
+                        (this.radius - this.parentCircle.r),
+                this.parentCircle.c.y -
+                    Math.cos(rotationRadians) *
+                        (this.radius - this.parentCircle.r)
             ),
             this.radius
         );
@@ -208,19 +212,31 @@ class SmallCircle {
         );
         this.currentPoint = currentPointInInnerCircle.add(this.c.c);
 
-        if (this.paintedPoints.length > 10) {
-            const distance = Point.distance(
-                this.currentPoint,
-                this.paintedPoints[9]
-            );
-            if (distance < 1) {
-                this.active = false;
-                this.paintedPoints = [...this.paintedPoints, this.currentPoint];
-                return;
-            }
+        if (this.hasStartedRepeating()) {
+            this.active = false;
+        } else {
+            this.paintedPoints = [...this.paintedPoints, this.currentPoint];
         }
+    }
 
-        this.paintedPoints = [...this.paintedPoints, this.currentPoint];
+    hasStartedRepeating() {
+        const POINTS_TO_CHECK = 10;
+        if (this.paintedPoints.length <= POINTS_TO_CHECK * 2) {
+            return false;
+        }
+        const firstPoints = this.paintedPoints.slice(0, POINTS_TO_CHECK);
+        const lastPoints = this.paintedPoints.slice(
+            this.paintedPoints.length - 1 - POINTS_TO_CHECK,
+            this.paintedPoints.length - 1
+        );
+        const diff = firstPoints
+            .map((firstPoint, index) =>
+                Point.distance(firstPoint, lastPoints[index])
+            )
+            .reduce((acc, partial) => acc + partial);
+        const avgDiff = diff / POINTS_TO_CHECK;
+
+        return avgDiff < 10;
     }
 }
 
