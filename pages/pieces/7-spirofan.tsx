@@ -14,6 +14,7 @@ interface ISketchParams {
     maxSmallCircleSize: number;
     minSmallCircleSize: number;
     rpm: number;
+    endThreshold: number;
 }
 
 const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'];
@@ -60,6 +61,13 @@ const paramsConfig = [
         max: 300,
         step: 1,
         defaultValue: 200,
+    },
+    {
+        name: 'endThreshold',
+        min: 0.1,
+        max: 10,
+        step: 0.1,
+        defaultValue: 3,
     },
 ];
 
@@ -135,7 +143,7 @@ const getSketchDefinition = (params: ISketchParams) => {
                 rotation = updateRotation(rotation, params.rpm, updateEveryMs);
                 circles.forEach((circle) => {
                     if (circle.active) {
-                        circle.update(rotation);
+                        circle.update(rotation, params.endThreshold);
                     }
                 });
             }
@@ -192,7 +200,7 @@ class SmallCircle {
         this.color = color;
     }
 
-    update(rotationRadians: number) {
+    update(rotationRadians: number, endThreshold: number) {
         this.c = new Circle(
             new Point(
                 this.parentCircle.c.x +
@@ -235,14 +243,14 @@ class SmallCircle {
         );
         this.currentPoint = currentPointInInnerCircle.add(this.c.c);
 
-        if (this.hasStartedRepeating()) {
+        if (this.hasStartedRepeating(endThreshold)) {
             this.active = false;
         } else {
             this.generatedPoints = [...this.generatedPoints, this.currentPoint];
         }
     }
 
-    hasStartedRepeating() {
+    hasStartedRepeating(threshold: number) {
         const MIN_POINTS = 30;
         const POINTS_TO_CHECK = 10;
         if (this.generatedPoints.length <= MIN_POINTS) {
@@ -260,7 +268,7 @@ class SmallCircle {
             .reduce((acc, partial) => acc + partial);
         const avgDiff = diff / POINTS_TO_CHECK;
 
-        return avgDiff < 5;
+        return avgDiff < threshold;
     }
 
     getPointsToPaint() {
