@@ -17,18 +17,13 @@ interface ISketchParams {
     showTools: number;
 }
 
-const colors = [
-    '#f72585',
-    '#b5179e',
-    '#7209b7',
-    '#560bad',
-    '#480ca8',
-    '#3a0ca3',
-    '#3f37c9',
-    '#4361ee',
-    '#4895ef',
-    '#4cc9f0',
-];
+const scale = chroma.scale([
+    '#ff595e',
+    '#ffca3a',
+    '#8ac926',
+    '#1982c4',
+    '#6a4c93',
+]);
 
 const paramsConfig = [
     {
@@ -134,7 +129,7 @@ const getSketchDefinition = (params: ISketchParams) => {
                         ),
                         smallCircleSize,
                         new Point(random(0, 1, true), random(0, 1, true)),
-                        chroma(sample(colors))
+                        scale(random(0, 1, true))
                     );
                 });
         }
@@ -194,7 +189,7 @@ const getSketchDefinition = (params: ISketchParams) => {
                 }
 
                 if (circle.paintedPoints.length > 1) {
-                    p5.strokeWeight(1);
+                    p5.strokeWeight(2);
                     p5.stroke(...circle.color.rgb());
                     circle.paintedPoints.forEach((point, index) => {
                         if (index !== circle.paintedPoints.length - 1) {
