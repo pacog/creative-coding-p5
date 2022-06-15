@@ -12,6 +12,7 @@ interface ISketchParams {
     rpm: number;
     pointInCircleX: number;
     pointInCircleY: number;
+    showTools: number;
 }
 const paramsConfig = [
     {
@@ -48,6 +49,13 @@ const paramsConfig = [
         max: 1,
         step: 0.05,
         defaultValue: 0.2,
+    },
+    {
+        name: 'showTools',
+        min: 0,
+        max: 1,
+        step: 1,
+        defaultValue: 0,
     },
 ];
 
@@ -113,6 +121,9 @@ const getSketchDefinition = (params: ISketchParams) => {
                 timesPaintedPerFrame++;
                 leftDeltaTime -= updateEveryMs;
                 rotation = updateRotation(rotation, params.rpm, p5.deltaTime);
+                if (smallCircle.active) {
+                    smallCircle.update(rotation);
+                }
             }
             if (timesPaintedPerFrame) {
                 doDraw();
@@ -122,13 +133,14 @@ const getSketchDefinition = (params: ISketchParams) => {
         function doDraw() {
             p5.background('#fff');
             p5.noFill();
-            p5.strokeWeight(1);
-            p5.stroke(100, 0, 0);
 
-            p5.circle(bigCircle.c.x, bigCircle.c.y, bigCircle.r * 2);
+            if (params.showTools) {
+                p5.strokeWeight(1);
+                p5.stroke(100, 0, 0);
+                p5.circle(bigCircle.c.x, bigCircle.c.y, bigCircle.r * 2);
+            }
 
-            if (smallCircle.active) {
-                smallCircle.update(rotation);
+            if (smallCircle.active && params.showTools) {
                 // Small circle
                 p5.strokeWeight(1);
                 p5.stroke(0, 200, 0);
@@ -137,6 +149,13 @@ const getSketchDefinition = (params: ISketchParams) => {
                     smallCircle.c.c.x,
                     smallCircle.c.c.y,
                     smallCircle.c.r * 2
+                );
+
+                p5.stroke(0, 255, 0);
+                p5.strokeWeight(10);
+                p5.point(
+                    smallCircle.currentPoint.x,
+                    smallCircle.currentPoint.y
                 );
             }
 
@@ -153,15 +172,6 @@ const getSketchDefinition = (params: ISketchParams) => {
                         );
                     }
                 });
-            }
-
-            if (smallCircle.active) {
-                p5.stroke(0, 255, 0);
-                p5.strokeWeight(10);
-                p5.point(
-                    smallCircle.currentPoint.x,
-                    smallCircle.currentPoint.y
-                );
             }
         }
     };
