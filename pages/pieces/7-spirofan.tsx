@@ -5,7 +5,7 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { Circle, Point } from '@mathigon/euclid';
-import { random, sample } from 'lodash';
+import { random, sample, shuffle } from 'lodash';
 
 interface ISketchParams {
     circles: number;
@@ -14,16 +14,9 @@ interface ISketchParams {
     maxSmallCircleSize: number;
     minSmallCircleSize: number;
     rpm: number;
-    showTools: number;
 }
 
-const scale = chroma.scale([
-    '#ff595e',
-    '#ffca3a',
-    '#8ac926',
-    '#1982c4',
-    '#6a4c93',
-]);
+const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'];
 
 const paramsConfig = [
     {
@@ -38,28 +31,28 @@ const paramsConfig = [
         min: 0.5,
         max: 1,
         step: 0.05,
-        defaultValue: 0.9,
+        defaultValue: 0.95,
     },
     {
         name: 'minBigCircleSize',
         min: 0.1,
         max: 0.45,
         step: 0.05,
-        defaultValue: 0.4,
+        defaultValue: 0.2,
     },
     {
         name: 'maxSmallCircleSize',
         min: 0.5,
         max: 1,
         step: 0.05,
-        defaultValue: 0.7,
+        defaultValue: 0.85,
     },
     {
         name: 'minSmallCircleSize',
         min: 0.1,
         max: 0.45,
         step: 0.05,
-        defaultValue: 0.4,
+        defaultValue: 0.2,
     },
     {
         name: 'rpm',
@@ -67,13 +60,6 @@ const paramsConfig = [
         max: 300,
         step: 1,
         defaultValue: 200,
-    },
-    {
-        name: 'showTools',
-        min: 0,
-        max: 1,
-        step: 1,
-        defaultValue: 0,
     },
 ];
 
@@ -105,11 +91,11 @@ const getSketchDefinition = (params: ISketchParams) => {
         const updateEveryMs = 1000 / FPS;
 
         p5.disableFriendlyErrors = true;
-
+        const shuffled = shuffle(colors);
         function initCircles() {
             circles = Array(params.circles)
                 .fill(null)
-                .map(() => {
+                .map((_item, index) => {
                     const bigCircleSize = random(
                         params.minBigCircleSize,
                         params.maxBigCircleSize,
@@ -129,7 +115,7 @@ const getSketchDefinition = (params: ISketchParams) => {
                         ),
                         smallCircleSize,
                         new Point(random(0, 1, true), random(0, 1, true)),
-                        scale(random(0, 1, true))
+                        chroma(shuffled[index % shuffled.length])
                     );
                 });
         }
@@ -137,11 +123,7 @@ const getSketchDefinition = (params: ISketchParams) => {
         p5.setup = () => {
             p5.createCanvas(p5.windowWidth, p5.windowHeight);
             initCircles();
-        };
-
-        p5.windowResized = () => {
-            p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-            initCircles();
+            p5.background('#fff');
         };
 
         p5.draw = () => {
@@ -163,45 +145,24 @@ const getSketchDefinition = (params: ISketchParams) => {
         };
 
         function doDraw() {
-            p5.background('#fff');
             p5.noFill();
-
             circles.forEach((circle) => {
-                if (circle.active && params.showTools) {
-                    // Big circle
-                    p5.strokeWeight(1);
-                    p5.stroke(100, 0, 0);
-                    p5.circle(
-                        circle.parentCircle.c.x,
-                        circle.parentCircle.c.y,
-                        circle.parentCircle.r * 2
-                    );
-
-                    // Small circle
-                    p5.strokeWeight(1);
-                    p5.stroke(0, 200, 0);
-
-                    p5.circle(circle.c.c.x, circle.c.c.y, circle.c.r * 2);
-
-                    p5.stroke(...circle.color.rgb());
-                    p5.strokeWeight(10);
-                    p5.point(circle.currentPoint.x, circle.currentPoint.y);
+                const toPaint = circle.getPointsToPaint();
+                if (toPaint.length < 2) {
+                    return;
                 }
-
-                if (circle.paintedPoints.length > 1) {
-                    p5.strokeWeight(2);
-                    p5.stroke(...circle.color.rgb());
-                    circle.paintedPoints.forEach((point, index) => {
-                        if (index !== circle.paintedPoints.length - 1) {
-                            p5.line(
-                                point.x,
-                                point.y,
-                                circle.paintedPoints[index + 1].x,
-                                circle.paintedPoints[index + 1].y
-                            );
-                        }
-                    });
-                }
+                p5.strokeWeight(2);
+                p5.stroke(...circle.color.rgb());
+                toPaint.forEach((point, index) => {
+                    if (index !== toPaint.length - 1) {
+                        p5.line(
+                            point.x,
+                            point.y,
+                            toPaint[index + 1].x,
+                            toPaint[index + 1].y
+                        );
+                    }
+                });
             });
         }
     };
@@ -210,12 +171,13 @@ const getSketchDefinition = (params: ISketchParams) => {
 class SmallCircle {
     parentCircle: Circle;
     active: boolean;
-    radius: number;
+    private radius: number;
     c: Circle;
-    paintedPoints: Point[] = [];
+    private generatedPoints: Point[] = [];
     currentPoint: Point;
     private initialPointInCircle: Point;
     color: chroma.Color;
+    private lastPaintedPoint: number;
 
     constructor(
         parentCircle: Circle,
@@ -276,20 +238,20 @@ class SmallCircle {
         if (this.hasStartedRepeating()) {
             this.active = false;
         } else {
-            this.paintedPoints = [...this.paintedPoints, this.currentPoint];
+            this.generatedPoints = [...this.generatedPoints, this.currentPoint];
         }
     }
 
     hasStartedRepeating() {
         const MIN_POINTS = 30;
         const POINTS_TO_CHECK = 10;
-        if (this.paintedPoints.length <= MIN_POINTS) {
+        if (this.generatedPoints.length <= MIN_POINTS) {
             return false;
         }
-        const firstPoints = this.paintedPoints.slice(0, POINTS_TO_CHECK);
-        const lastPoints = this.paintedPoints.slice(
-            this.paintedPoints.length - 1 - POINTS_TO_CHECK,
-            this.paintedPoints.length - 1
+        const firstPoints = this.generatedPoints.slice(0, POINTS_TO_CHECK);
+        const lastPoints = this.generatedPoints.slice(
+            this.generatedPoints.length - 1 - POINTS_TO_CHECK,
+            this.generatedPoints.length - 1
         );
         const diff = firstPoints
             .map((firstPoint, index) =>
@@ -299,6 +261,15 @@ class SmallCircle {
         const avgDiff = diff / POINTS_TO_CHECK;
 
         return avgDiff < 5;
+    }
+
+    getPointsToPaint() {
+        const firstToPaint = this.lastPaintedPoint || 0;
+        if (this.generatedPoints.length - firstToPaint > 1) {
+            this.lastPaintedPoint = this.generatedPoints.length - 1;
+            return this.generatedPoints.slice(firstToPaint);
+        }
+        return [];
     }
 }
 
