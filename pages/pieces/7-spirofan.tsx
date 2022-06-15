@@ -80,7 +80,6 @@ export default function Spirofan() {
 }
 const getSketchDefinition = (params: ISketchParams) => {
     return (p5: P5) => {
-        let bigCircle: Circle;
         let smallCircle: SmallCircle;
         let rotation = 0;
         let leftDeltaTime = 0;
@@ -90,15 +89,13 @@ const getSketchDefinition = (params: ISketchParams) => {
         p5.disableFriendlyErrors = true;
 
         function initCircles() {
-            bigCircle = new Circle(
-                new Point(p5.windowWidth / 2, p5.windowHeight / 2),
-                (params.bigCircleSize *
-                    Math.min(p5.windowWidth, p5.windowHeight)) /
-                    2
-            );
-
             smallCircle = new SmallCircle(
-                bigCircle,
+                new Circle(
+                    new Point(p5.windowWidth / 2, p5.windowHeight / 2),
+                    (params.bigCircleSize *
+                        Math.min(p5.windowWidth, p5.windowHeight)) /
+                        2
+                ),
                 params.smallCircleSize,
                 new Point(params.pointInCircleX, params.pointInCircleY)
             );
@@ -135,12 +132,18 @@ const getSketchDefinition = (params: ISketchParams) => {
             p5.noFill();
 
             if (params.showTools) {
-                p5.strokeWeight(1);
-                p5.stroke(100, 0, 0);
-                p5.circle(bigCircle.c.x, bigCircle.c.y, bigCircle.r * 2);
             }
 
             if (smallCircle.active && params.showTools) {
+                // Big circle
+                p5.strokeWeight(1);
+                p5.stroke(100, 0, 0);
+                p5.circle(
+                    smallCircle.parentCircle.c.x,
+                    smallCircle.parentCircle.c.y,
+                    smallCircle.parentCircle.r * 2
+                );
+
                 // Small circle
                 p5.strokeWeight(1);
                 p5.stroke(0, 200, 0);
