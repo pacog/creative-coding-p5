@@ -14,7 +14,6 @@ interface ISketchParams {
     maxSmallCircleSize: number;
     minSmallCircleSize: number;
     rpm: number;
-    showTools: number;
 }
 
 const scale = chroma.scale([
@@ -67,13 +66,6 @@ const paramsConfig = [
         max: 300,
         step: 1,
         defaultValue: 200,
-    },
-    {
-        name: 'showTools',
-        min: 0,
-        max: 1,
-        step: 1,
-        defaultValue: 0,
     },
 ];
 
@@ -137,11 +129,7 @@ const getSketchDefinition = (params: ISketchParams) => {
         p5.setup = () => {
             p5.createCanvas(p5.windowWidth, p5.windowHeight);
             initCircles();
-        };
-
-        p5.windowResized = () => {
-            p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-            initCircles();
+            p5.background('#fff');
         };
 
         p5.draw = () => {
@@ -163,45 +151,24 @@ const getSketchDefinition = (params: ISketchParams) => {
         };
 
         function doDraw() {
-            p5.background('#fff');
             p5.noFill();
-
             circles.forEach((circle) => {
-                if (circle.active && params.showTools) {
-                    // Big circle
-                    p5.strokeWeight(1);
-                    p5.stroke(100, 0, 0);
-                    p5.circle(
-                        circle.parentCircle.c.x,
-                        circle.parentCircle.c.y,
-                        circle.parentCircle.r * 2
-                    );
-
-                    // Small circle
-                    p5.strokeWeight(1);
-                    p5.stroke(0, 200, 0);
-
-                    p5.circle(circle.c.c.x, circle.c.c.y, circle.c.r * 2);
-
-                    p5.stroke(...circle.color.rgb());
-                    p5.strokeWeight(10);
-                    p5.point(circle.currentPoint.x, circle.currentPoint.y);
+                const toPaint = circle.getPointsToPaint();
+                if (toPaint.length < 2) {
+                    return;
                 }
-
-                if (circle.paintedPoints.length > 1) {
-                    p5.strokeWeight(2);
-                    p5.stroke(...circle.color.rgb());
-                    circle.paintedPoints.forEach((point, index) => {
-                        if (index !== circle.paintedPoints.length - 1) {
-                            p5.line(
-                                point.x,
-                                point.y,
-                                circle.paintedPoints[index + 1].x,
-                                circle.paintedPoints[index + 1].y
-                            );
-                        }
-                    });
-                }
+                p5.strokeWeight(2);
+                p5.stroke(...circle.color.rgb());
+                toPaint.forEach((point, index) => {
+                    if (index !== toPaint.length - 1) {
+                        p5.line(
+                            point.x,
+                            point.y,
+                            toPaint[index + 1].x,
+                            toPaint[index + 1].y
+                        );
+                    }
+                });
             });
         }
     };
@@ -210,12 +177,13 @@ const getSketchDefinition = (params: ISketchParams) => {
 class SmallCircle {
     parentCircle: Circle;
     active: boolean;
-    radius: number;
+    private radius: number;
     c: Circle;
-    paintedPoints: Point[] = [];
+    private generatedPoints: Point[] = [];
     currentPoint: Point;
     private initialPointInCircle: Point;
     color: chroma.Color;
+    private lastPaintedPoint: number;
 
     constructor(
         parentCircle: Circle,
@@ -276,20 +244,20 @@ class SmallCircle {
         if (this.hasStartedRepeating()) {
             this.active = false;
         } else {
-            this.paintedPoints = [...this.paintedPoints, this.currentPoint];
+            this.generatedPoints = [...this.generatedPoints, this.currentPoint];
         }
     }
 
     hasStartedRepeating() {
         const MIN_POINTS = 30;
         const POINTS_TO_CHECK = 10;
-        if (this.paintedPoints.length <= MIN_POINTS) {
+        if (this.generatedPoints.length <= MIN_POINTS) {
             return false;
         }
-        const firstPoints = this.paintedPoints.slice(0, POINTS_TO_CHECK);
-        const lastPoints = this.paintedPoints.slice(
-            this.paintedPoints.length - 1 - POINTS_TO_CHECK,
-            this.paintedPoints.length - 1
+        const firstPoints = this.generatedPoints.slice(0, POINTS_TO_CHECK);
+        const lastPoints = this.generatedPoints.slice(
+            this.generatedPoints.length - 1 - POINTS_TO_CHECK,
+            this.generatedPoints.length - 1
         );
         const diff = firstPoints
             .map((firstPoint, index) =>
@@ -299,6 +267,15 @@ class SmallCircle {
         const avgDiff = diff / POINTS_TO_CHECK;
 
         return avgDiff < 5;
+    }
+
+    getPointsToPaint() {
+        const firstToPaint = this.lastPaintedPoint || 0;
+        if (this.generatedPoints.length - firstToPaint > 1) {
+            this.lastPaintedPoint = this.generatedPoints.length - 1;
+            return this.generatedPoints.slice(firstToPaint);
+        }
+        return [];
     }
 }
 
