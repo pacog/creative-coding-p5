@@ -276,7 +276,7 @@ class SmallCircle {
             .reduce((acc, partial) => acc + partial);
         const avgDiff = diff / POINTS_TO_CHECK;
 
-        return avgDiff < 10;
+        return avgDiff < 5;
     }
 }
 
