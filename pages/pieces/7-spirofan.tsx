@@ -5,29 +5,44 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { Circle, Point } from '@mathigon/euclid';
+import { random } from 'lodash';
 
 interface ISketchParams {
-    bigCircleSize: number;
-    smallCircleSize: number;
+    maxBigCircleSize: number;
+    minBigCircleSize: number;
+    maxSmallCircleSize: number;
+    minSmallCircleSize: number;
     rpm: number;
-    pointInCircleX: number;
-    pointInCircleY: number;
     showTools: number;
 }
 const paramsConfig = [
     {
-        name: 'bigCircleSize',
-        min: 0.1,
+        name: 'maxBigCircleSize',
+        min: 0.5,
         max: 1,
         step: 0.05,
         defaultValue: 0.9,
     },
     {
-        name: 'smallCircleSize',
+        name: 'minBigCircleSize',
         min: 0.1,
-        max: 0.95,
+        max: 0.45,
         step: 0.05,
-        defaultValue: 0.5,
+        defaultValue: 0.4,
+    },
+    {
+        name: 'maxSmallCircleSize',
+        min: 0.5,
+        max: 1,
+        step: 0.05,
+        defaultValue: 0.7,
+    },
+    {
+        name: 'minSmallCircleSize',
+        min: 0.1,
+        max: 0.45,
+        step: 0.05,
+        defaultValue: 0.4,
     },
     {
         name: 'rpm',
@@ -35,20 +50,6 @@ const paramsConfig = [
         max: 300,
         step: 1,
         defaultValue: 200,
-    },
-    {
-        name: 'pointInCircleX',
-        min: 0,
-        max: 1,
-        step: 0.05,
-        defaultValue: 0.5,
-    },
-    {
-        name: 'pointInCircleY',
-        min: 0,
-        max: 1,
-        step: 0.05,
-        defaultValue: 0.2,
     },
     {
         name: 'showTools',
@@ -89,15 +90,25 @@ const getSketchDefinition = (params: ISketchParams) => {
         p5.disableFriendlyErrors = true;
 
         function initCircles() {
+            const bigCircleSize = random(
+                params.minBigCircleSize,
+                params.maxBigCircleSize,
+                true
+            );
+            const smallCircleSize = random(
+                params.minSmallCircleSize,
+                params.maxSmallCircleSize,
+                true
+            );
             smallCircle = new SmallCircle(
                 new Circle(
                     new Point(p5.windowWidth / 2, p5.windowHeight / 2),
-                    (params.bigCircleSize *
+                    (bigCircleSize *
                         Math.min(p5.windowWidth, p5.windowHeight)) /
                         2
                 ),
-                params.smallCircleSize,
-                new Point(params.pointInCircleX, params.pointInCircleY)
+                smallCircleSize,
+                new Point(random(0, 1, true), random(0, 1, true))
             );
         }
 
@@ -130,9 +141,6 @@ const getSketchDefinition = (params: ISketchParams) => {
         function doDraw() {
             p5.background('#fff');
             p5.noFill();
-
-            if (params.showTools) {
-            }
 
             if (smallCircle.active && params.showTools) {
                 // Big circle
