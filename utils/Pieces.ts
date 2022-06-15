@@ -23,4 +23,8 @@ export const pieces = {
         title: 'Game of life',
         description: "Yet another Conway's game of life",
     },
+    7: {
+        title: 'Spirofan',
+        description: 'Spirograph inspired',
+    },
 };
