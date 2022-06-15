@@ -174,10 +174,10 @@ class SmallCircle {
             new Point(
                 this.parentCircle.c.x +
                     Math.sin(rotationRadians) *
-                        (this.radius - this.parentCircle.r),
+                        (this.parentCircle.r - this.radius),
                 this.parentCircle.c.y -
                     Math.cos(rotationRadians) *
-                        (this.radius - this.parentCircle.r)
+                        (this.parentCircle.r - this.radius)
             ),
             this.radius
         );
