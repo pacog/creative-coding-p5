@@ -155,7 +155,7 @@ const getSketchDefinition = (params: ISketchParams) => {
             while (leftDeltaTime > updateEveryMs) {
                 timesPaintedPerFrame++;
                 leftDeltaTime -= updateEveryMs;
-                rotation = updateRotation(rotation, params.rpm, p5.deltaTime);
+                rotation = updateRotation(rotation, params.rpm, updateEveryMs);
                 circles.forEach((circle) => {
                     if (circle.active) {
                         circle.update(rotation);
