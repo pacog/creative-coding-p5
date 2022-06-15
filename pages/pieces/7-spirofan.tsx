@@ -31,9 +31,9 @@ const paramsConfig = [
     {
         name: 'rpm',
         min: 100,
-        max: 1000,
+        max: 300,
         step: 1,
-        defaultValue: 30,
+        defaultValue: 200,
     },
     {
         name: 'pointInCircleX',
@@ -143,12 +143,16 @@ const getSketchDefinition = (params: ISketchParams) => {
             if (smallCircle.paintedPoints.length > 1) {
                 p5.strokeWeight(1);
                 p5.stroke(0, 0, 200);
-                p5.beginShape();
-                for (const point of smallCircle.paintedPoints) {
-                    p5.curveVertex(point.x, point.y);
-                }
-
-                p5.endShape();
+                smallCircle.paintedPoints.forEach((point, index) => {
+                    if (index !== smallCircle.paintedPoints.length - 1) {
+                        p5.line(
+                            point.x,
+                            point.y,
+                            smallCircle.paintedPoints[index + 1].x,
+                            smallCircle.paintedPoints[index + 1].y
+                        );
+                    }
+                });
             }
 
             if (smallCircle.active) {
