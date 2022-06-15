@@ -30,7 +30,7 @@ const paramsConfig = [
     },
     {
         name: 'rpm',
-        min: 1,
+        min: 100,
         max: 1000,
         step: 1,
         defaultValue: 30,
@@ -75,7 +75,9 @@ const getSketchDefinition = (params: ISketchParams) => {
         let bigCircle: Circle;
         let smallCircle: SmallCircle;
         let rotation = 0;
-        let points: Point[] = [];
+        let leftDeltaTime = 0;
+        const FPS = 60;
+        const updateEveryMs = 1000 / FPS;
 
         p5.disableFriendlyErrors = true;
 
@@ -105,12 +107,24 @@ const getSketchDefinition = (params: ISketchParams) => {
         };
 
         p5.draw = () => {
+            leftDeltaTime += p5.deltaTime;
+            let timesPaintedPerFrame = 0;
+            while (leftDeltaTime > updateEveryMs) {
+                timesPaintedPerFrame++;
+                leftDeltaTime -= updateEveryMs;
+                rotation = updateRotation(rotation, params.rpm, p5.deltaTime);
+            }
+            if (timesPaintedPerFrame) {
+                doDraw();
+            }
+        };
+
+        function doDraw() {
             p5.background('#fff');
             p5.noFill();
             p5.strokeWeight(1);
             p5.stroke(100, 0, 0);
 
-            rotation = updateRotation(rotation, params.rpm, p5.deltaTime);
             p5.circle(bigCircle.c.x, bigCircle.c.y, bigCircle.r * 2);
 
             if (smallCircle.active) {
@@ -145,7 +159,7 @@ const getSketchDefinition = (params: ISketchParams) => {
                     smallCircle.currentPoint.y
                 );
             }
-        };
+        }
     };
 };
 
@@ -220,8 +234,9 @@ class SmallCircle {
     }
 
     hasStartedRepeating() {
+        const MIN_POINTS = 30;
         const POINTS_TO_CHECK = 10;
-        if (this.paintedPoints.length <= POINTS_TO_CHECK * 2) {
+        if (this.paintedPoints.length <= MIN_POINTS) {
             return false;
         }
         const firstPoints = this.paintedPoints.slice(0, POINTS_TO_CHECK);
