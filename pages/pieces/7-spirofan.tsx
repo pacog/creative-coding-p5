@@ -73,7 +73,8 @@ export default function Spirofan() {
 }
 const getSketchDefinition = (params: ISketchParams) => {
     return (p5: P5) => {
-        let rotation = 1;
+        let rotation = 0;
+        let points: Point[] = [];
 
         p5.disableFriendlyErrors = true;
 
@@ -158,8 +159,19 @@ const getSketchDefinition = (params: ISketchParams) => {
             const currentPointInCircle =
                 currentPointInInnerCircle.add(smallCircleCenter);
 
-            p5.strokeWeight(10);
-            p5.stroke(0, 0, 200);
+            points = [...points, currentPointInCircle];
+
+            if (points.length > 1) {
+                p5.strokeWeight(1);
+                p5.stroke(0, 0, 200);
+                p5.beginShape();
+                for (const point of points) {
+                    p5.curveVertex(point.x, point.y);
+                }
+
+                p5.endShape();
+            }
+
             p5.stroke(200, 0, 200);
             p5.point(currentPointInCircle.x, currentPointInCircle.y);
         };
@@ -172,5 +184,5 @@ function updateRotation(
     deltaTimeMs: number
 ) {
     const deltaRotation = (deltaTimeMs * rpm) / 60_000;
-    return keepNumberInside(currentRotation + deltaRotation, 0, Math.PI * 2);
+    return currentRotation + deltaRotation;
 }
