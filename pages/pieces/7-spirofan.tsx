@@ -5,10 +5,11 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { Circle, Point } from '@mathigon/euclid';
-import { random, sample, shuffle } from 'lodash';
+import { random, flatten, shuffle } from 'lodash';
 
 interface ISketchParams {
     circles: number;
+    circlesSharingBigCircle: number;
     maxBigCircleSize: number;
     minBigCircleSize: number;
     rpm: number;
@@ -26,6 +27,13 @@ const paramsConfig = [
         defaultValue: 3,
     },
     {
+        name: 'circlesSharingBigCircle',
+        min: 1,
+        max: 10,
+        step: 1,
+        defaultValue: 1,
+    },
+    {
         name: 'maxBigCircleSize',
         min: 0.5,
         max: 1,
@@ -37,7 +45,7 @@ const paramsConfig = [
         min: 0.1,
         max: 0.45,
         step: 0.05,
-        defaultValue: 0.2,
+        defaultValue: 0.4,
     },
     {
         name: 'rpm',
@@ -85,30 +93,50 @@ const getSketchDefinition = (params: ISketchParams) => {
         p5.disableFriendlyErrors = true;
         const shuffled = shuffle(colors);
         function initCircles() {
-            circles = Array(params.circles)
-                .fill(null)
-                .map((_item, index) => {
-                    const bigCircleSize = random(
-                        params.minBigCircleSize,
-                        params.maxBigCircleSize,
-                        true
-                    );
-                    const denominator = random(2, 20);
-                    const numerator = random(1, denominator - 1);
-                    const smallCircleSize = numerator / denominator;
-                    console.log({ smallCircleSize });
-                    return new SmallCircle(
-                        new Circle(
-                            new Point(p5.windowWidth / 2, p5.windowHeight / 2),
-                            (bigCircleSize *
-                                Math.min(p5.windowWidth, p5.windowHeight)) /
-                                2
-                        ),
-                        smallCircleSize,
-                        new Point(random(0, 1, true), random(0, 1, true)),
-                        chroma(shuffled[index % shuffled.length])
-                    );
-                });
+            let circleNumber = 0;
+            circles = flatten(
+                Array(params.circles)
+                    .fill(null)
+                    .map(() => {
+                        const bigCircleSize = random(
+                            params.minBigCircleSize,
+                            params.maxBigCircleSize,
+                            true
+                        );
+                        const denominator = random(2, 20);
+                        const numerator = random(1, denominator - 1);
+                        const smallCircleSize = numerator / denominator;
+
+                        return Array(params.circlesSharingBigCircle)
+                            .fill(null)
+                            .map(() => {
+                                circleNumber++;
+
+                                return new SmallCircle(
+                                    new Circle(
+                                        new Point(
+                                            p5.windowWidth / 2,
+                                            p5.windowHeight / 2
+                                        ),
+                                        (bigCircleSize *
+                                            Math.min(
+                                                p5.windowWidth,
+                                                p5.windowHeight
+                                            )) /
+                                            2
+                                    ),
+                                    smallCircleSize,
+                                    new Point(
+                                        random(0, 1, true),
+                                        random(0, 1, true)
+                                    ),
+                                    chroma(
+                                        shuffled[circleNumber % shuffled.length]
+                                    )
+                                );
+                            });
+                    })
+            );
         }
 
         p5.setup = () => {
