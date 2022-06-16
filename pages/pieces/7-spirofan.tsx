@@ -11,8 +11,6 @@ interface ISketchParams {
     circles: number;
     maxBigCircleSize: number;
     minBigCircleSize: number;
-    maxSmallCircleSize: number;
-    minSmallCircleSize: number;
     rpm: number;
     endThreshold: number;
 }
@@ -36,20 +34,6 @@ const paramsConfig = [
     },
     {
         name: 'minBigCircleSize',
-        min: 0.1,
-        max: 0.45,
-        step: 0.05,
-        defaultValue: 0.2,
-    },
-    {
-        name: 'maxSmallCircleSize',
-        min: 0.5,
-        max: 1,
-        step: 0.05,
-        defaultValue: 0.85,
-    },
-    {
-        name: 'minSmallCircleSize',
         min: 0.1,
         max: 0.45,
         step: 0.05,
@@ -109,11 +93,10 @@ const getSketchDefinition = (params: ISketchParams) => {
                         params.maxBigCircleSize,
                         true
                     );
-                    const smallCircleSize = random(
-                        params.minSmallCircleSize,
-                        params.maxSmallCircleSize,
-                        true
-                    );
+                    const denominator = random(2, 20);
+                    const numerator = random(1, denominator - 1);
+                    const smallCircleSize = numerator / denominator;
+                    console.log({ smallCircleSize });
                     return new SmallCircle(
                         new Circle(
                             new Point(p5.windowWidth / 2, p5.windowHeight / 2),
