@@ -4,6 +4,7 @@ import type P5 from 'p5';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
+import { Point } from '@mathigon/euclid';
 
 interface ISketchParams {
     rotateX: number;
@@ -63,14 +64,14 @@ const paramsConfig = [
         min: 2,
         max: 300,
         step: 1,
-        defaultValue: 20,
+        defaultValue: 100,
     },
     {
         name: 'divisionsY',
         min: 2,
         max: 300,
         step: 1,
-        defaultValue: 20,
+        defaultValue: 100,
     },
 ];
 
@@ -93,10 +94,24 @@ export default function Blanket() {
         </PieceLayout>
     );
 }
+
+interface IDisruption {
+    x: number;
+    y: number;
+    maxZ: number;
+}
+
+type Vertex = [number, number, number];
+type Vertices = Vertex[][];
+
 const getSketchDefinition = (params: ISketchParams) => {
     return (p5: P5) => {
-        let vertices: [number, number, number][][] = [];
-
+        let vertices: Vertices = [];
+        const disruption: IDisruption = {
+            x: 0,
+            y: 0,
+            maxZ: 10,
+        };
         p5.disableFriendlyErrors = true;
 
         p5.setup = () => {
@@ -122,9 +137,53 @@ const getSketchDefinition = (params: ISketchParams) => {
 
         p5.draw = () => {
             p5.background('#fff');
+            vertices = updateVertices(
+                vertices,
+                [disruption],
+                p5.deltaTime,
+                p5.millis()
+            );
             paintVertices(p5, params, vertices);
         };
     };
+
+    function updateVertices(
+        old: Vertices,
+        disruptors: IDisruption[],
+        deltaTimeMs,
+        currentTimeMs
+    ) {
+        return old.map((line) =>
+            line.map((vertex) =>
+                disrupt(vertex, disruptors, deltaTimeMs, currentTimeMs)
+            )
+        );
+    }
+
+    function disrupt(
+        vertex: Vertex,
+        disruptors: IDisruption[],
+        deltaTimeMs,
+        currentTimeMs
+    ): Vertex {
+        const vertexPoint = new Point(vertex[0], vertex[1]);
+        const vertexDisruptions = disruptors.map((disruptor) => {
+            const distance = Point.distance(
+                new Point(disruptor.x, disruptor.y),
+                vertexPoint
+            );
+            const diffZ = disruptor.maxZ * Math.sin(distance);
+            const result: Vertex = [0, 0, diffZ];
+            return result;
+        });
+        return vertexDisruptions.reduce((acc, disruption) => {
+            return [
+                acc[0] + disruption[0],
+                acc[1] + disruption[1],
+                acc[2] + disruption[2],
+            ];
+        }, vertex);
+    }
 
     function createVertices(
         width: number,
@@ -134,7 +193,7 @@ const getSketchDefinition = (params: ISketchParams) => {
     ) {
         const start = { x: -width / 2, y: -height / 2 };
         const end = { x: width / 2, y: height / 2 };
-        const v: [number, number, number][][] = [];
+        const v: Vertices = [];
         for (let i = 0; i < xDivisions; i++) {
             const xRatio = i / (xDivisions - 1);
             const newLine: [number, number, number][] = [];
@@ -151,11 +210,7 @@ const getSketchDefinition = (params: ISketchParams) => {
         return v;
     }
 
-    function paintVertices(
-        p5: P5,
-        params: ISketchParams,
-        v: [number, number, number][][]
-    ) {
+    function paintVertices(p5: P5, params: ISketchParams, v: Vertices) {
         p5.translate(params.translateX, params.translateY, params.translateZ);
 
         p5.rotateX(params.rotateX);
