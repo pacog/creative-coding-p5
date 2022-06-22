@@ -64,14 +64,14 @@ const paramsConfig = [
         min: 2,
         max: 300,
         step: 1,
-        defaultValue: 100,
+        defaultValue: 40,
     },
     {
         name: 'divisionsY',
         min: 2,
         max: 300,
         step: 1,
-        defaultValue: 100,
+        defaultValue: 40,
     },
 ];
 
@@ -100,6 +100,7 @@ interface IDisruption {
     y: number;
     maxZ: number;
     wavelenght: number; // px
+    frequency: number; // Hz
 }
 
 type Vertex = [number, number, number];
@@ -113,12 +114,12 @@ const getSketchDefinition = (params: ISketchParams) => {
             y: 0,
             maxZ: 10,
             wavelenght: 50,
+            frequency: 1,
         };
         p5.disableFriendlyErrors = true;
 
         p5.setup = () => {
             p5.createCanvas(p5.windowWidth, p5.windowHeight, p5.WEBGL);
-            p5.noLoop();
             vertices = createVertices(
                 p5.windowWidth,
                 p5.windowHeight,
@@ -177,17 +178,30 @@ const getSketchDefinition = (params: ISketchParams) => {
             const restInWave = distance % disruptor.wavelenght;
             const positionInWave =
                 (2 * Math.PI * restInWave) / disruptor.wavelenght;
-            const diffZ = disruptor.maxZ * Math.sin(positionInWave);
+
+            let positionInCycle = 0;
+            if (disruptor.frequency) {
+                const oscillateEveryMs = 1000 / disruptor.frequency;
+                positionInCycle =
+                    (2 * Math.PI * (currentTimeMs % oscillateEveryMs)) /
+                    oscillateEveryMs;
+            }
+
+            const diffZ =
+                disruptor.maxZ * Math.sin(positionInWave + positionInCycle);
             const result: Vertex = [0, 0, diffZ];
             return result;
         });
-        return vertexDisruptions.reduce((acc, disruption) => {
-            return [
-                acc[0] + disruption[0],
-                acc[1] + disruption[1],
-                acc[2] + disruption[2],
-            ];
-        }, vertex);
+        return vertexDisruptions.reduce(
+            (acc, disruption) => {
+                return [
+                    acc[0] + disruption[0],
+                    acc[1] + disruption[1],
+                    acc[2] + disruption[2],
+                ];
+            },
+            [vertex[0], vertex[1], 0]
+        );
     }
 
     function createVertices(
