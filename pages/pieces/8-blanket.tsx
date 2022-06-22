@@ -99,6 +99,7 @@ interface IDisruption {
     x: number;
     y: number;
     maxZ: number;
+    wavelenght: number; // px
 }
 
 type Vertex = [number, number, number];
@@ -111,6 +112,7 @@ const getSketchDefinition = (params: ISketchParams) => {
             x: 0,
             y: 0,
             maxZ: 10,
+            wavelenght: 50,
         };
         p5.disableFriendlyErrors = true;
 
@@ -172,7 +174,10 @@ const getSketchDefinition = (params: ISketchParams) => {
                 new Point(disruptor.x, disruptor.y),
                 vertexPoint
             );
-            const diffZ = disruptor.maxZ * Math.sin(distance);
+            const restInWave = distance % disruptor.wavelenght;
+            const positionInWave =
+                (2 * Math.PI * restInWave) / disruptor.wavelenght;
+            const diffZ = disruptor.maxZ * Math.sin(positionInWave);
             const result: Vertex = [0, 0, diffZ];
             return result;
         });
