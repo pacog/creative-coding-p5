@@ -236,17 +236,13 @@ const getSketchDefinition = (params: ISketchParams) => {
         p5.rotateY(params.rotateY);
         p5.rotateZ(params.rotateZ);
 
+        p5.beginShape(p5.TRIANGLE_STRIP);
+
         for (let i = 0; i < v.length - 1; i++) {
             for (let j = 0; j < v[i].length - 1; j++) {
-                p5.beginShape();
-                p5.vertex(...v[i][j + 1]);
                 p5.vertex(...v[i][j]);
-                p5.vertex(...v[i + 1][j]);
-                p5.vertex(...v[i][j + 1]);
-                p5.vertex(...v[i + 1][j + 1]);
-                p5.vertex(...v[i + 1][j]);
-                p5.endShape();
             }
         }
+        p5.endShape();
     }
 };
