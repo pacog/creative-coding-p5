@@ -15,6 +15,8 @@ interface ISketchParams {
     translateZ: number;
     divisionsX: number;
     divisionsY: number;
+    maxZDisruption: number;
+    wavelenght: number;
 }
 const paramsConfig = [
     {
@@ -73,6 +75,20 @@ const paramsConfig = [
         step: 1,
         defaultValue: 25,
     },
+    {
+        name: 'maxZDisruption',
+        min: 1,
+        max: 100,
+        step: 1,
+        defaultValue: 10,
+    },
+    {
+        name: 'wavelenght',
+        min: 1,
+        max: 500,
+        step: 1,
+        defaultValue: 250,
+    },
 ];
 
 export default function Blanket() {
@@ -112,8 +128,8 @@ const getSketchDefinition = (params: ISketchParams) => {
         const disruption: IDisruption = {
             x: 0,
             y: 0,
-            maxZ: 10,
-            wavelenght: 50,
+            maxZ: params.maxZDisruption,
+            wavelenght: params.wavelenght,
             frequency: 1,
         };
         p5.disableFriendlyErrors = true;
@@ -186,9 +202,15 @@ const getSketchDefinition = (params: ISketchParams) => {
                     (2 * Math.PI * (currentTimeMs % oscillateEveryMs)) /
                     oscillateEveryMs;
             }
-
+            let distanceAttenuation = 1;
+            // if (distance > 0) {
+            //     distanceAttenuation = 1 / Math.sqrt(distance);
+            // }
             const diffZ =
-                disruptor.maxZ * Math.sin(positionInWave + positionInCycle);
+                distanceAttenuation *
+                disruptor.maxZ *
+                Math.cos(positionInWave - positionInCycle);
+
             const result: Vertex = [0, 0, diffZ];
             return result;
         });
