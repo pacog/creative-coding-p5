@@ -125,6 +125,7 @@ interface IDisruption {
     maxZ: number;
     wavelenght: number; // px
     frequency: number; // Hz
+    offset: number;
 }
 
 type Vertex = [number, number, number];
@@ -133,13 +134,24 @@ type Vertices = Vertex[][];
 const getSketchDefinition = (params: ISketchParams) => {
     return (p5: P5) => {
         let vertices: Vertices = [];
-        const disruption: IDisruption = {
-            x: 0,
-            y: 0,
-            maxZ: params.maxZDisruption,
-            wavelenght: params.wavelenght,
-            frequency: 1,
-        };
+        const disruptions: IDisruption[] = [
+            {
+                x: -100,
+                y: 0,
+                maxZ: params.maxZDisruption,
+                wavelenght: params.wavelenght,
+                frequency: 1,
+                offset: 0,
+            },
+            {
+                x: 100,
+                y: 0,
+                maxZ: params.maxZDisruption,
+                wavelenght: params.wavelenght,
+                frequency: 1,
+                offset: Math.PI,
+            },
+        ];
         p5.disableFriendlyErrors = true;
 
         p5.setup = () => {
@@ -166,7 +178,7 @@ const getSketchDefinition = (params: ISketchParams) => {
             p5.background('#fff');
             vertices = updateVertices(
                 vertices,
-                [disruption],
+                disruptions,
                 p5.deltaTime,
                 p5.millis()
             );
@@ -217,7 +229,7 @@ const getSketchDefinition = (params: ISketchParams) => {
             const diffZ =
                 distanceAttenuation *
                 disruptor.maxZ *
-                Math.cos(positionInWave - positionInCycle);
+                Math.cos(positionInWave - positionInCycle + disruptor.offset);
 
             const result: Vertex = [0, 0, diffZ];
             return result;
