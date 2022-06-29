@@ -27,4 +27,8 @@ export const pieces = {
         title: 'Spirofan',
         description: 'Spirograph inspired',
     },
+    8: {
+        title: 'Blanket',
+        description: '3d blanket',
+    },
 };
