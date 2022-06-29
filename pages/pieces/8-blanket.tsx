@@ -5,6 +5,7 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { Point } from '@mathigon/euclid';
+import { random } from 'lodash';
 
 interface ISketchParams {
     rotateX: number;
@@ -15,9 +16,15 @@ interface ISketchParams {
     translateZ: number;
     divisionsX: number;
     divisionsY: number;
+    disruptors: number;
+    minZDisruption: number;
     maxZDisruption: number;
-    wavelenght: number;
-    disruptionSize: number;
+    minWavelenght: number;
+    maxWavelenght: number;
+    minDisruptionSize: number;
+    maxDisruptionSize: number;
+    minFrequency: number;
+    maxFrequency: number;
 }
 const paramsConfig = [
     {
@@ -77,25 +84,67 @@ const paramsConfig = [
         defaultValue: 25,
     },
     {
-        name: 'maxZDisruption',
+        name: 'disruptors',
+        min: 1,
+        max: 10,
+        step: 1,
+        defaultValue: 3,
+    },
+    {
+        name: 'minZDisruption',
         min: 1,
         max: 100,
         step: 1,
         defaultValue: 10,
     },
     {
-        name: 'wavelenght',
+        name: 'maxZDisruption',
+        min: 20,
+        max: 100,
+        step: 1,
+        defaultValue: 30,
+    },
+    {
+        name: 'minWavelenght',
         min: 1,
+        max: 250,
+        step: 1,
+        defaultValue: 250,
+    },
+    {
+        name: 'maxWavelenght',
+        min: 250,
         max: 500,
         step: 1,
         defaultValue: 250,
     },
     {
-        name: 'disruptionSize',
+        name: 'minDisruptionSize',
         min: 10,
+        max: 1000,
+        step: 10,
+        defaultValue: 500,
+    },
+    {
+        name: 'maxDisruptionSize',
+        min: 1000,
         max: 2000,
         step: 10,
-        defaultValue: 250,
+        defaultValue: 1000,
+    },
+    {
+        name: 'minFrequency',
+        min: 0.1,
+        max: 1,
+        step: 0.1,
+        defaultValue: 1,
+    },
+    {
+        name: 'maxFrequency',
+        min: 1,
+        max: 10,
+        step: 0.1,
+        defaultValue: 1,
     },
 ];
 
@@ -126,6 +175,7 @@ interface IDisruption {
     wavelenght: number; // px
     frequency: number; // Hz
     offset: number;
+    size: number; // px
 }
 
 type Vertex = [number, number, number];
@@ -134,24 +184,34 @@ type Vertices = Vertex[][];
 const getSketchDefinition = (params: ISketchParams) => {
     return (p5: P5) => {
         let vertices: Vertices = [];
-        const disruptions: IDisruption[] = [
-            {
-                x: -100,
-                y: 0,
-                maxZ: params.maxZDisruption,
-                wavelenght: params.wavelenght,
-                frequency: 1,
-                offset: 0,
-            },
-            {
-                x: 100,
-                y: 0,
-                maxZ: params.maxZDisruption,
-                wavelenght: params.wavelenght,
-                frequency: 1,
-                offset: Math.PI,
-            },
-        ];
+        const disruptions: IDisruption[] = new Array(params.disruptors)
+            .fill({})
+            .map(() => ({
+                x: random(-p5.windowWidth / 2, p5.windowWidth / 2, true),
+                y: random(-p5.windowHeight / 2, p5.windowHeight / 2, true),
+                maxZ: random(
+                    params.minZDisruption,
+                    params.maxZDisruption,
+                    true
+                ),
+                wavelenght: random(
+                    params.minWavelenght,
+                    params.maxWavelenght,
+                    true
+                ),
+                size: random(
+                    params.minDisruptionSize,
+                    params.maxDisruptionSize,
+                    true
+                ),
+                frequency: random(
+                    params.minFrequency,
+                    params.maxFrequency,
+                    true
+                ),
+                offset: random(0, Math.PI * 2, true),
+            }));
+        console.log({ disruptions });
         p5.disableFriendlyErrors = true;
 
         p5.setup = () => {
@@ -223,9 +283,7 @@ const getSketchDefinition = (params: ISketchParams) => {
                     oscillateEveryMs;
             }
             const distanceAttenuation =
-                1 -
-                Math.min(distance, params.disruptionSize) /
-                    params.disruptionSize;
+                1 - Math.min(distance, disruptor.size) / disruptor.size;
             const diffZ =
                 distanceAttenuation *
                 disruptor.maxZ *
