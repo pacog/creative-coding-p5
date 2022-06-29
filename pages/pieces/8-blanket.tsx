@@ -17,6 +17,7 @@ interface ISketchParams {
     divisionsY: number;
     maxZDisruption: number;
     wavelenght: number;
+    disruptionSize: number;
 }
 const paramsConfig = [
     {
@@ -87,6 +88,13 @@ const paramsConfig = [
         min: 1,
         max: 500,
         step: 1,
+        defaultValue: 250,
+    },
+    {
+        name: 'disruptionSize',
+        min: 10,
+        max: 2000,
+        step: 10,
         defaultValue: 250,
     },
 ];
@@ -202,10 +210,10 @@ const getSketchDefinition = (params: ISketchParams) => {
                     (2 * Math.PI * (currentTimeMs % oscillateEveryMs)) /
                     oscillateEveryMs;
             }
-            let distanceAttenuation = 1;
-            // if (distance > 0) {
-            //     distanceAttenuation = 1 / Math.sqrt(distance);
-            // }
+            const distanceAttenuation =
+                1 -
+                Math.min(distance, params.disruptionSize) /
+                    params.disruptionSize;
             const diffZ =
                 distanceAttenuation *
                 disruptor.maxZ *
