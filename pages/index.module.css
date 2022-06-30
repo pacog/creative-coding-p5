@@ -1,0 +1,14 @@
+.root {
+    font-family: 'Roboto', sans-serif;
+    color: var(--c-white);
+}
+
+.content {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.title {
+    font-family: 'Abril Fatface', cursive;
+}
