@@ -31,4 +31,28 @@
     background: black;
     aspect-ratio: 1;
     display: block;
+    position: relative;
+}
+
+.pieceTitle,
+.pieceNumber {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.pieceNumber {
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 200px;
+    color: black;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.pieceTitle {
+    opacity: 0;
 }
