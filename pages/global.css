@@ -1,11 +1,4 @@
-body {
-    margin: 0;
-    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-        'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-        'Helvetica Neue', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-
+html {
     /* https://colorhunt.co/palette/1b243051557e816797d6d5a8 */
     --c-dark: #1b2430;
     --c-alt1: #51557e;
@@ -13,13 +6,32 @@ body {
     --c-light: #d6d5a8;
     --c-white: #fff;
 
-    background: var(--c-dark);
+    background-color: var(--c-dark);
     background: radial-gradient(
         circle at 90vh 90vw,
         var(--c-alt1) 0%,
         var(--c-dark) 80%,
         var(--c-dark) 100%
     );
+    background-attachment: fixed;
+}
+
+body {
+    margin: 0;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+        'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+        'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+    box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
 }
 
 body,
