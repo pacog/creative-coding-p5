@@ -30,7 +30,7 @@ export const piecesArray: IPiece[] = [
     },
     {
         title: 'On spirals',
-        description: 'Spirals dranw using the Fibonacci sequence.',
+        description: 'Spirals drawn using the Fibonacci sequence.',
         url: '/pieces/3-on-spirals',
         previewImg: preview3,
     },
