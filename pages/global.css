@@ -1,7 +1,8 @@
 html {
     /* https://colorhunt.co/palette/1b243051557e816797d6d5a8 */
-    --c-dark: #1b2430;
-    --c-medium-dark: #3d4e64;
+    --c-dark-100: #1b2430;
+    --c-dark-300: #3d4e64;
+    --c-dark-500: #7089a9;
     --c-alt1: #51557e;
     --c-alt2: #816797;
     --c-light: #d6d5a8;

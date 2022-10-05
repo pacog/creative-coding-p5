@@ -6,13 +6,13 @@
     top: 0;
     left: 0;
     padding: 8px 16px;
-    background: rgba(3, 4, 94, 0.5);
-    border-right: 1px solid #023e8a;
-    border-bottom: 1px solid #023e8a;
-    border-radius: 0 0 8px 0;
+    background: var(--c-white);
+    border-right: 1px solid var(--c-alt1);
+    border-bottom: 1px solid var(--c-alt1);
     transform: translateY(-100%);
     opacity: 0;
     transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    box-shadow: 0 5px 10px rgba(26, 26, 48, 0.15);
 }
 
 .HeaderNavigation {
@@ -48,12 +48,12 @@
     cursor: default;
 }
 .HeaderTitle {
-    color: white;
-    font-size: 16px;
-    line-height: 20px;
+    color: var(--c-dark-100);
+    font-size: 24px;
+    line-height: 32px;
 }
 .HeaderDescription {
-    color: #d9d9d9;
+    color: var(--c-dark-500);
     margin-top: 4px;
     font-size: 12px;
     line-height: 16px;

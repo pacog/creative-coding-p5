@@ -1,6 +1,6 @@
 .root {
     font-family: 'Jost', sans-serif;
-    color: var(--c-dark);
+    color: var(--c-dark-100);
 }
 .title {
     font-size: 40px;
@@ -52,14 +52,14 @@
 .pieceText {
     padding: 12px 12px;
     font-size: 14px;
-    color: var(--c-dark);
+    color: var(--c-dark-100);
 }
 
 .pieceTitle {
 }
 
 .pieceDescription {
-    color: var(--c-medium-dark);
+    color: var(--c-dark-300);
     font-size: 12px;
 }
 

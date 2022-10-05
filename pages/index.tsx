@@ -59,6 +59,7 @@ function PieceLink({ piece }: PieceLinkProps) {
                         objectFit="cover"
                         src={piece.previewImg}
                         alt=""
+                        priority={true}
                     />
                 </div>
 
