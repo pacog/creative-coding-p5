@@ -21,7 +21,7 @@ export default function SingleValueParam({
                     max={paramConfig.max}
                     step={paramConfig.step || 1}
                     value={value}
-                    onChange={(ev) => onChange(ev)}
+                    onChange={(newValue) => onChange(newValue)}
                 />
             }
             value={<>({value.toFixed(2)})</>}

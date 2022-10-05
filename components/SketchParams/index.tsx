@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useThrottle } from 'react-use';
-import { ISingleValueParam, Param, ParamTypes } from 'utils/Params';
+import {
+    IRangeParam,
+    ISingleValueParam,
+    Param,
+    ParamTypes,
+} from 'utils/Params';
+import RangeParam from './RangeParam';
 import SingleValueParam from './SingleValueParam';
 import styles from './style.module.css';
 
@@ -26,7 +32,19 @@ export default function SketchParams<ParamsType>({
             {paramConfig.map((param) => {
                 switch (param.type) {
                     case ParamTypes.RANGE:
-                        return <div key={param.name}>TODO</div>;
+                        return (
+                            <RangeParam
+                                key={param.name}
+                                paramConfig={param as IRangeParam}
+                                value={values[param.name]}
+                                onChange={(newValue) => {
+                                    setValues((old) => ({
+                                        ...old,
+                                        [param.name]: newValue,
+                                    }));
+                                }}
+                            />
+                        );
                     case ParamTypes.SINGLE_VALUE:
                         return (
                             <SingleValueParam

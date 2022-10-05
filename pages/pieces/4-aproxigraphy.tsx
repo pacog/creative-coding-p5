@@ -4,12 +4,11 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import { random } from 'lodash';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
-import { ParamTypes } from 'utils/Params';
+import { IRangeParamValue, ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     pointsPerFrame: number; // seconds
-    minPointSize: number;
-    maxPointSize: number;
+    pointSize: IRangeParamValue;
 }
 
 const paramsConfig = [
@@ -22,20 +21,12 @@ const paramsConfig = [
         defaultValue: 20,
     },
     {
-        type: ParamTypes.SINGLE_VALUE,
-        name: 'minPointSize',
+        type: ParamTypes.RANGE,
+        name: 'pointSize',
         min: 1,
         max: 40,
         step: 1,
-        defaultValue: 3,
-    },
-    {
-        type: ParamTypes.SINGLE_VALUE,
-        name: 'maxPointSize',
-        min: 1,
-        max: 40,
-        step: 1,
-        defaultValue: 20,
+        defaultValue: { min: 3, max: 20 },
     },
 ];
 
@@ -102,8 +93,8 @@ const getSketchDefinition = (params: ISketchParams) => {
             const color = getColorAt(pixelToDraw.x, pixelToDraw.y);
             p5.fill(color[0], color[1], color[2]);
 
-            const min = Math.min(params.minPointSize, params.maxPointSize);
-            const max = Math.max(params.minPointSize, params.maxPointSize);
+            const min = Math.min(params.pointSize.min, params.pointSize.max);
+            const max = Math.max(params.pointSize.min, params.pointSize.max);
 
             p5.circle(pixelInScreen.x, pixelInScreen.y, random(min, max));
         }

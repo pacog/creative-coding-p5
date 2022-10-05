@@ -12,13 +12,18 @@ export interface ISingleValueParam {
     defaultValue: number;
 }
 
-interface IRangeParam {
+export interface IRangeParam {
     type: ParamTypes;
     name: string;
     min: number;
     max: number;
     step?: number;
-    defaultValue: [number, number];
+    defaultValue: IRangeParamValue;
+}
+
+export interface IRangeParamValue {
+    min: number;
+    max: number;
 }
 
 export type Param = ISingleValueParam | IRangeParam;
