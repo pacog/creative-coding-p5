@@ -1,18 +1,13 @@
 html {
     /* https://colorhunt.co/palette/1b243051557e816797d6d5a8 */
     --c-dark: #1b2430;
+    --c-medium-dark: #3d4e64;
     --c-alt1: #51557e;
     --c-alt2: #816797;
     --c-light: #d6d5a8;
     --c-white: #fff;
 
-    background-color: var(--c-dark);
-    background: radial-gradient(
-        circle at 90vh 90vw,
-        var(--c-alt1) 0%,
-        var(--c-dark) 80%,
-        var(--c-dark) 100%
-    );
+    background-color: var(--c-white);
     background-attachment: fixed;
 }
 

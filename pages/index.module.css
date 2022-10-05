@@ -1,6 +1,10 @@
 .root {
-    font-family: 'Roboto', sans-serif;
-    color: var(--c-white);
+    font-family: 'Jost', sans-serif;
+    color: var(--c-dark);
+}
+.title {
+    font-size: 40px;
+    line-height: 42px;
 }
 
 .content {
@@ -9,17 +13,17 @@
     padding: 20px;
 }
 
-.title {
-    font-family: 'Abril Fatface', cursive;
+.intro {
+    margin-top: 24px;
+    margin-bottom: 32px;
 }
 
 .piecesList {
     list-style: none;
     padding: 0;
     display: grid;
-    /* grid-template-columns: repeat(3, minmax(var(--min-piece-size), 1fr)); */
     grid-template-columns: repeat(auto-fit, minmax(186px, 1fr));
-    gap: 8px;
+    gap: 32px;
 }
 
 .piecesList li {
@@ -28,31 +32,39 @@
 
 .piece {
     width: 100%;
-    background: black;
-    aspect-ratio: 1;
+    background: var(--c-white);
     display: block;
+    box-shadow: 0 5px 10px rgba(26, 26, 48, 0.15);
+    text-decoration: none;
+    outline: 1px solid transparent;
+    transition: outline-color 0.1s ease-in;
+}
+.piece:hover {
+    outline-color: rgba(26, 26, 48, 0.25);
+    box-shadow: 0 5px 10px rgba(26, 26, 48, 0.25);
+}
+
+.pieceBG {
+    aspect-ratio: 1.2;
     position: relative;
 }
 
-.pieceTitle,
-.pieceNumber {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
-
-.pieceNumber {
-    font-family: 'Roboto', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 200px;
-    color: black;
-    background: rgba(255, 255, 255, 0.4);
+.pieceText {
+    padding: 12px 12px;
+    font-size: 14px;
+    color: var(--c-dark);
 }
 
 .pieceTitle {
-    opacity: 0;
+}
+
+.pieceDescription {
+    color: var(--c-medium-dark);
+    font-size: 12px;
+}
+
+.footer {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 12px;
 }
