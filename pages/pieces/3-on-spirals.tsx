@@ -7,8 +7,7 @@ import PieceLayout from 'components/PieceLayout';
 import { project } from 'utils/number';
 import { random } from 'lodash';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
-
-const SPIRALS_PER_GROUP = 3;
+import { ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     groups: number;
@@ -17,6 +16,7 @@ interface ISketchParams {
 
 const paramsConfig = [
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'groups',
         min: 1,
         max: 20,
@@ -24,6 +24,7 @@ const paramsConfig = [
         defaultValue: 5,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'spiralsPerGroup',
         min: 1,
         max: 10,

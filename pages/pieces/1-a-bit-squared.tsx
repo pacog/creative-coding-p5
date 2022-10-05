@@ -7,6 +7,7 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import { keepNumberInside, project } from 'utils/number';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
+import { ParamTypes } from 'utils/Params';
 
 const MIN_BALL_SPEED = 30;
 const MAX_BALL_SPEED = 100;
@@ -87,6 +88,7 @@ const getSketchDefinition = (params: ISketchParams) => {
 
 const paramsConfig = [
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'ballSize',
         min: 1,
         max: 60,
@@ -94,6 +96,7 @@ const paramsConfig = [
         defaultValue: 40,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'totalBalls',
         min: 100,
         max: 5000,

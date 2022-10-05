@@ -4,6 +4,7 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import { random } from 'lodash';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
+import { ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     pointsPerFrame: number; // seconds
@@ -13,6 +14,7 @@ interface ISketchParams {
 
 const paramsConfig = [
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'pointsPerFrame',
         min: 1,
         max: 200,
@@ -20,6 +22,7 @@ const paramsConfig = [
         defaultValue: 20,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'minPointSize',
         min: 1,
         max: 40,
@@ -27,6 +30,7 @@ const paramsConfig = [
         defaultValue: 3,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'maxPointSize',
         min: 1,
         max: 40,

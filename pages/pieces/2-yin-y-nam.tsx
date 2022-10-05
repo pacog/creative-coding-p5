@@ -7,6 +7,7 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import { keepNumberInside } from 'utils/number';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
+import { ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     rotateEvery: number; // seconds
@@ -44,6 +45,7 @@ const getSketchDefinition = (params: ISketchParams) => {
 
 const paramsConfig = [
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'rotateEvery',
         min: 1,
         max: 200,
@@ -51,6 +53,7 @@ const paramsConfig = [
         defaultValue: 100,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'maxDepth',
         min: 1,
         max: 10,

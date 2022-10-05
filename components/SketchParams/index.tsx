@@ -1,17 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useThrottle } from 'react-use';
+import { ISingleValueParam, Param, ParamTypes } from 'utils/Params';
+import SingleValueParam from './SingleValueParam';
 import styles from './style.module.css';
 
-interface IParamConfig {
-    name: string;
-    min: number;
-    max: number;
-    step?: number;
-    defaultValue: number;
-}
-
 interface ISketchParamsProps<ParamsType> {
-    paramConfig: IParamConfig[];
+    paramConfig: Param[];
     onChange: (newValue: ParamsType) => void;
     throttleTime?: number;
 }
@@ -29,33 +23,31 @@ export default function SketchParams<ParamsType>({
 
     return (
         <div>
-            {paramConfig.map((param) => (
-                <div className={styles.Param} key={param.name}>
-                    <div className={styles.ParamLabel}>{param.name}</div>
-                    <input
-                        className={styles.ParamValue}
-                        type="range"
-                        min={param.min}
-                        max={param.max}
-                        step={param.step || 1}
-                        value={values[param.name]}
-                        onChange={(ev) => {
-                            setValues((old) => ({
-                                ...old,
-                                [param.name]: parseFloat(ev.target.value),
-                            }));
-                        }}
-                    />
-                    <div className={styles.ParamPreview}>
-                        ({values[param.name].toFixed(2)})
-                    </div>
-                </div>
-            ))}
+            {paramConfig.map((param) => {
+                switch (param.type) {
+                    case ParamTypes.RANGE:
+                        return <div key={param.name}>TODO</div>;
+                    case ParamTypes.SINGLE_VALUE:
+                        return (
+                            <SingleValueParam
+                                key={param.name}
+                                paramConfig={param as ISingleValueParam}
+                                value={values[param.name]}
+                                onChange={(newValue) => {
+                                    setValues((old) => ({
+                                        ...old,
+                                        [param.name]: newValue,
+                                    }));
+                                }}
+                            />
+                        );
+                }
+            })}
         </div>
     );
 }
 
-export function getInitialParamsValue(paramConfig: IParamConfig[]) {
+export function getInitialParamsValue(paramConfig: Param[]) {
     return paramConfig.reduce((acc, eachParam) => {
         return {
             ...acc,

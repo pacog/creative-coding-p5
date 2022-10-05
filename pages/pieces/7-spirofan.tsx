@@ -6,6 +6,7 @@ import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { Circle, Point } from '@mathigon/euclid';
 import { random, flatten, shuffle } from 'lodash';
+import { ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     circles: number;
@@ -20,6 +21,7 @@ const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'];
 
 const paramsConfig = [
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'circles',
         min: 1,
         max: 10,
@@ -27,6 +29,7 @@ const paramsConfig = [
         defaultValue: 3,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'circlesSharingBigCircle',
         min: 1,
         max: 10,
@@ -34,6 +37,7 @@ const paramsConfig = [
         defaultValue: 1,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'maxBigCircleSize',
         min: 0.5,
         max: 1,
@@ -41,6 +45,7 @@ const paramsConfig = [
         defaultValue: 0.95,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'minBigCircleSize',
         min: 0.1,
         max: 0.45,
@@ -48,6 +53,7 @@ const paramsConfig = [
         defaultValue: 0.4,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'rpm',
         min: 100,
         max: 300,
@@ -55,6 +61,7 @@ const paramsConfig = [
         defaultValue: 200,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'endThreshold',
         min: 0.1,
         max: 10,

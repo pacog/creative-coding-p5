@@ -6,6 +6,7 @@ import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
+import { ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     lineCreators: number;
@@ -18,6 +19,7 @@ interface ISketchParams {
 }
 const paramsConfig = [
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'lineCreators',
         min: 1,
         max: 20,
@@ -25,6 +27,7 @@ const paramsConfig = [
         defaultValue: 5,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'minWidth',
         min: 5,
         max: 200,
@@ -32,6 +35,7 @@ const paramsConfig = [
         defaultValue: 5,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'maxWidth',
         min: 5,
         max: 200,
@@ -39,6 +43,7 @@ const paramsConfig = [
         defaultValue: 100,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'minSpeed',
         min: 10,
         max: 2000,
@@ -46,6 +51,7 @@ const paramsConfig = [
         defaultValue: 80,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'maxSpeed',
         min: 10,
         max: 2000,
@@ -53,6 +59,7 @@ const paramsConfig = [
         defaultValue: 1000,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'minFreqChangeDirection',
         min: 1,
         max: 50,
@@ -60,6 +67,7 @@ const paramsConfig = [
         defaultValue: 2,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'maxFreqChangeDirection',
         min: 1,
         max: 50,
