@@ -1,0 +1,70 @@
+.root {
+    font-family: 'Jost', sans-serif;
+    color: var(--c-dark-100);
+}
+.title {
+    font-size: 40px;
+    line-height: 42px;
+}
+
+.content {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.intro {
+    margin-top: 24px;
+    margin-bottom: 32px;
+}
+
+.piecesList {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(186px, 1fr));
+    gap: 32px;
+}
+
+.piecesList li {
+    display: flex;
+}
+
+.piece {
+    width: 100%;
+    background: var(--c-white);
+    display: block;
+    box-shadow: 0 5px 10px rgba(26, 26, 48, 0.15);
+    text-decoration: none;
+    outline: 1px solid transparent;
+    transition: outline-color 0.1s ease-in;
+}
+.piece:hover {
+    outline-color: rgba(26, 26, 48, 0.25);
+    box-shadow: 0 5px 10px rgba(26, 26, 48, 0.25);
+}
+
+.pieceBG {
+    aspect-ratio: 1.2;
+    position: relative;
+}
+
+.pieceText {
+    padding: 12px 12px;
+    font-size: 14px;
+    color: var(--c-dark-100);
+}
+
+.pieceTitle {
+}
+
+.pieceDescription {
+    color: var(--c-dark-300);
+    font-size: 12px;
+}
+
+.footer {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 12px;
+}

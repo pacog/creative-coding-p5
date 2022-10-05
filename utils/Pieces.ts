@@ -1,34 +1,77 @@
-export const pieces = {
-    1: {
+import preview1 from './previewPieces/1.png';
+import preview2 from './previewPieces/2.png';
+import preview3 from './previewPieces/3.png';
+import preview4 from './previewPieces/4.png';
+import preview5 from './previewPieces/5.png';
+import preview6 from './previewPieces/6.png';
+import preview7 from './previewPieces/7.png';
+import preview8 from './previewPieces/8.png';
+
+export interface IPiece {
+    id: number;
+    title: string;
+    description: string;
+    url: string;
+    previewImg: StaticImageData;
+}
+
+export const piecesArray: IPiece[] = [
+    {
         title: 'A bit squared',
-        description: 'Squares floating around and being pushed by your mouse',
+        description: 'Playing around with particles and the loop.',
+        url: '/pieces/1-a-bit-squared',
+        previewImg: preview1,
     },
-    2: {
-        title: 'Random fractals',
-        description: 'Fun with fractal circles',
+    {
+        title: 'El Yin y el Ñam',
+        description: 'Fractal recursive circles.',
+        url: '/pieces/2-yin-y-nam',
+        previewImg: preview2,
     },
-    3: {
-        title: 'Spiraling',
-        description: 'Fibonacci spirals',
+    {
+        title: 'On spirals',
+        description: 'Spirals drawn using the Fibonacci sequence.',
+        url: '/pieces/3-on-spirals',
+        previewImg: preview3,
     },
-    4: {
+    {
         title: 'Aproxigraphy',
-        description: 'Aproximating a photo with shapes',
+        description: 'Aproximating a photo with shapes.',
+        url: '/pieces/4-aproxigraphy',
+        previewImg: preview4,
     },
-    5: {
+    {
         title: 'Lines? Lines!',
-        description: 'Lines auto creating art',
+        description: 'Playing with lines and palettes.',
+        url: '/pieces/5-lines-lines',
+        previewImg: preview5,
     },
-    6: {
-        title: 'Game of life',
-        description: "Yet another Conway's game of life",
+    {
+        title: 'Game of Life',
+        description: "Yet another Conway's Game of Life.",
+        url: '/pieces/6-game-of-life',
+        previewImg: preview6,
     },
-    7: {
+    {
         title: 'Spirofan',
-        description: 'Spirograph inspired',
+        description: 'Spirograph in your browser.',
+        url: '/pieces/7-spirofan',
+        previewImg: preview7,
     },
-    8: {
+    {
         title: 'Blanket',
-        description: '3d blanket',
+        description: 'Experimenting with 3D and sines.',
+        url: '/pieces/8-blanket',
+        previewImg: preview8,
     },
-};
+].map((piece, index) => ({ ...piece, id: index + 1 }));
+
+export const pieces: { [key: number]: IPiece } = piecesArray.reduce(
+    (acc, piece) => {
+        return {
+            ...acc,
+            [piece.id]: piece,
+        };
+    },
+    {}
+);
