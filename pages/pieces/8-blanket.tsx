@@ -6,7 +6,7 @@ import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { Point } from '@mathigon/euclid';
 import { random } from 'lodash';
-import { ParamTypes } from 'utils/Params';
+import { IRangeParamValue, ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     rotateX: number;
@@ -18,14 +18,10 @@ interface ISketchParams {
     divisionsX: number;
     divisionsY: number;
     disruptors: number;
-    minZDisruption: number;
-    maxZDisruption: number;
-    minWavelenght: number;
-    maxWavelenght: number;
-    minDisruptionSize: number;
-    maxDisruptionSize: number;
-    minFrequency: number;
-    maxFrequency: number;
+    zDisruption: IRangeParamValue;
+    wavelenght: IRangeParamValue;
+    disruptionSize: IRangeParamValue;
+    frequency: number;
 }
 const paramsConfig = [
     {
@@ -101,66 +97,34 @@ const paramsConfig = [
         defaultValue: 3,
     },
     {
-        type: ParamTypes.SINGLE_VALUE,
-        name: 'minZDisruption',
+        type: ParamTypes.RANGE,
+        name: 'zDisruption',
         min: 1,
         max: 100,
         step: 1,
-        defaultValue: 10,
+        defaultValue: { min: 10, max: 30 },
     },
     {
-        type: ParamTypes.SINGLE_VALUE,
-        name: 'maxZDisruption',
-        min: 20,
-        max: 100,
-        step: 1,
-        defaultValue: 30,
-    },
-    {
-        type: ParamTypes.SINGLE_VALUE,
-        name: 'minWavelenght',
+        type: ParamTypes.RANGE,
+        name: 'wavelenght',
         min: 1,
-        max: 250,
-        step: 1,
-        defaultValue: 250,
-    },
-    {
-        type: ParamTypes.SINGLE_VALUE,
-        name: 'maxWavelenght',
-        min: 250,
         max: 500,
         step: 1,
-        defaultValue: 250,
+        defaultValue: { min: 250, max: 260 },
     },
     {
-        type: ParamTypes.SINGLE_VALUE,
-        name: 'minDisruptionSize',
+        type: ParamTypes.RANGE,
+        name: 'disruptionSize',
         min: 10,
-        max: 1000,
-        step: 10,
-        defaultValue: 500,
-    },
-    {
-        type: ParamTypes.SINGLE_VALUE,
-        name: 'maxDisruptionSize',
-        min: 1000,
         max: 2000,
         step: 10,
-        defaultValue: 1000,
+        defaultValue: { min: 500, max: 1000 },
     },
     {
         type: ParamTypes.SINGLE_VALUE,
-        name: 'minFrequency',
+        name: 'frequency',
         min: 0.1,
-        max: 1,
-        step: 0.1,
-        defaultValue: 1,
-    },
-    {
-        type: ParamTypes.SINGLE_VALUE,
-        name: 'maxFrequency',
-        min: 1,
-        max: 10,
+        max: 4,
         step: 0.1,
         defaultValue: 1,
     },
@@ -208,28 +172,24 @@ const getSketchDefinition = (params: ISketchParams) => {
                 x: random(-p5.windowWidth / 2, p5.windowWidth / 2, true),
                 y: random(-p5.windowHeight / 2, p5.windowHeight / 2, true),
                 maxZ: random(
-                    params.minZDisruption,
-                    params.maxZDisruption,
+                    params.zDisruption.min,
+                    params.zDisruption.max,
                     true
                 ),
                 wavelenght: random(
-                    params.minWavelenght,
-                    params.maxWavelenght,
+                    params.wavelenght.min,
+                    params.wavelenght.max,
                     true
                 ),
                 size: random(
-                    params.minDisruptionSize,
-                    params.maxDisruptionSize,
+                    params.disruptionSize.min,
+                    params.disruptionSize.min,
                     true
                 ),
-                frequency: random(
-                    params.minFrequency,
-                    params.maxFrequency,
-                    true
-                ),
+                frequency: params.frequency,
                 offset: random(0, Math.PI * 2, true),
             }));
-        console.log({ disruptions });
+
         p5.disableFriendlyErrors = true;
 
         p5.setup = () => {
