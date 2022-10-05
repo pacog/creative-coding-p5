@@ -1,4 +1,5 @@
 import { ISingleValueParam } from 'utils/Params';
+import { Slider } from '@mantine/core';
 import ParamWrapper from './ParamWrapper';
 
 export default function SingleValueParam({
@@ -14,13 +15,13 @@ export default function SingleValueParam({
         <ParamWrapper
             label={paramConfig.name}
             input={
-                <input
-                    type="range"
+                <Slider
+                    label={null}
                     min={paramConfig.min}
                     max={paramConfig.max}
                     step={paramConfig.step || 1}
                     value={value}
-                    onChange={(ev) => onChange(parseFloat(ev.target.value))}
+                    onChange={(ev) => onChange(ev)}
                 />
             }
             value={<>({value.toFixed(2)})</>}

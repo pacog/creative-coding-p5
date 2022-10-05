@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding-left: 49px;
+    padding: 8px 0;
 }
 .ParamLabel {
     min-width: 100px;
@@ -17,7 +17,7 @@
 }
 
 .ParamInput {
-    min-width: 100px;
+    min-width: 200px;
     display: block;
 }
 
