@@ -1,0 +1,28 @@
+.Param {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 0;
+}
+.ParamLabel {
+    min-width: 100px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    color: var(--c-dark-100);
+    font-size: 12px;
+    text-align: right;
+}
+.ParamLabel:last-of-type {
+    margin-bottom: 0;
+}
+
+.ParamInput {
+    min-width: 200px;
+    display: block;
+}
+
+.ParamValue {
+    margin-left: 5px;
+    font-size: 12px;
+    color: var(--c-dark-500);
+}

@@ -3,6 +3,9 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@emotion/react": "^11.10.4",
+        "@mantine/core": "^5.5.4",
+        "@mantine/hooks": "^5.5.4",
         "@mathigon/euclid": "^1.0.5",
         "chroma-js": "^2.1.2",
         "lodash": "^4.17.21",

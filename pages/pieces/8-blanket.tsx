@@ -6,6 +6,7 @@ import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { Point } from '@mathigon/euclid';
 import { random } from 'lodash';
+import { IRangeParamValue, ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     rotateX: number;
@@ -17,17 +18,14 @@ interface ISketchParams {
     divisionsX: number;
     divisionsY: number;
     disruptors: number;
-    minZDisruption: number;
-    maxZDisruption: number;
-    minWavelenght: number;
-    maxWavelenght: number;
-    minDisruptionSize: number;
-    maxDisruptionSize: number;
-    minFrequency: number;
-    maxFrequency: number;
+    zDisruption: IRangeParamValue;
+    wavelenght: IRangeParamValue;
+    disruptionSize: IRangeParamValue;
+    frequency: number;
 }
 const paramsConfig = [
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'rotateX',
         min: 0,
         max: Math.PI * 2,
@@ -35,6 +33,7 @@ const paramsConfig = [
         defaultValue: 1.1,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'rotateY',
         min: 0,
         max: Math.PI * 2,
@@ -42,6 +41,7 @@ const paramsConfig = [
         defaultValue: 0,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'rotateZ',
         min: 0,
         max: Math.PI * 2,
@@ -49,6 +49,7 @@ const paramsConfig = [
         defaultValue: 0,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'translateX',
         min: -300,
         max: 300,
@@ -56,6 +57,7 @@ const paramsConfig = [
         defaultValue: 0,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'translateY',
         min: -300,
         max: 300,
@@ -63,6 +65,7 @@ const paramsConfig = [
         defaultValue: -50,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'translateZ',
         min: -300,
         max: 300,
@@ -70,6 +73,7 @@ const paramsConfig = [
         defaultValue: -100,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'divisionsX',
         min: 2,
         max: 100,
@@ -77,6 +81,7 @@ const paramsConfig = [
         defaultValue: 25,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'divisionsY',
         min: 2,
         max: 100,
@@ -84,6 +89,7 @@ const paramsConfig = [
         defaultValue: 25,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'disruptors',
         min: 1,
         max: 10,
@@ -91,58 +97,34 @@ const paramsConfig = [
         defaultValue: 3,
     },
     {
-        name: 'minZDisruption',
+        type: ParamTypes.RANGE,
+        name: 'zDisruption',
         min: 1,
         max: 100,
         step: 1,
-        defaultValue: 10,
+        defaultValue: { min: 10, max: 30 },
     },
     {
-        name: 'maxZDisruption',
-        min: 20,
-        max: 100,
-        step: 1,
-        defaultValue: 30,
-    },
-    {
-        name: 'minWavelenght',
+        type: ParamTypes.RANGE,
+        name: 'wavelenght',
         min: 1,
-        max: 250,
-        step: 1,
-        defaultValue: 250,
-    },
-    {
-        name: 'maxWavelenght',
-        min: 250,
         max: 500,
         step: 1,
-        defaultValue: 250,
+        defaultValue: { min: 250, max: 260 },
     },
     {
-        name: 'minDisruptionSize',
+        type: ParamTypes.RANGE,
+        name: 'disruptionSize',
         min: 10,
-        max: 1000,
-        step: 10,
-        defaultValue: 500,
-    },
-    {
-        name: 'maxDisruptionSize',
-        min: 1000,
         max: 2000,
         step: 10,
-        defaultValue: 1000,
+        defaultValue: { min: 500, max: 1000 },
     },
     {
-        name: 'minFrequency',
+        type: ParamTypes.SINGLE_VALUE,
+        name: 'frequency',
         min: 0.1,
-        max: 1,
-        step: 0.1,
-        defaultValue: 1,
-    },
-    {
-        name: 'maxFrequency',
-        min: 1,
-        max: 10,
+        max: 4,
         step: 0.1,
         defaultValue: 1,
     },
@@ -190,28 +172,24 @@ const getSketchDefinition = (params: ISketchParams) => {
                 x: random(-p5.windowWidth / 2, p5.windowWidth / 2, true),
                 y: random(-p5.windowHeight / 2, p5.windowHeight / 2, true),
                 maxZ: random(
-                    params.minZDisruption,
-                    params.maxZDisruption,
+                    params.zDisruption.min,
+                    params.zDisruption.max,
                     true
                 ),
                 wavelenght: random(
-                    params.minWavelenght,
-                    params.maxWavelenght,
+                    params.wavelenght.min,
+                    params.wavelenght.max,
                     true
                 ),
                 size: random(
-                    params.minDisruptionSize,
-                    params.maxDisruptionSize,
+                    params.disruptionSize.min,
+                    params.disruptionSize.min,
                     true
                 ),
-                frequency: random(
-                    params.minFrequency,
-                    params.maxFrequency,
-                    true
-                ),
+                frequency: params.frequency,
                 offset: random(0, Math.PI * 2, true),
             }));
-        console.log({ disruptions });
+
         p5.disableFriendlyErrors = true;
 
         p5.setup = () => {

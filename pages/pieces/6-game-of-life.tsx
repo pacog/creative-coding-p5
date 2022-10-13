@@ -6,6 +6,7 @@ import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { shouldNextCellBeAlive } from 'utils/gameOfLifeUtils';
 import { Matrix } from 'utils/Matrix';
+import { ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     cellSizePx: number;
@@ -14,6 +15,7 @@ interface ISketchParams {
 }
 const paramsConfig = [
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'cellSizePx',
         min: 1,
         max: 40,
@@ -21,6 +23,7 @@ const paramsConfig = [
         defaultValue: 7,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'paintEveryMs',
         min: 16,
         max: 1000,
@@ -28,6 +31,7 @@ const paramsConfig = [
         defaultValue: 160,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'initialChance',
         min: 0,
         max: 1,

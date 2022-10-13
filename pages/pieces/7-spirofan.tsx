@@ -6,12 +6,12 @@ import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { Circle, Point } from '@mathigon/euclid';
 import { random, flatten, shuffle } from 'lodash';
+import { IRangeParamValue, ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     circles: number;
     circlesSharingBigCircle: number;
-    maxBigCircleSize: number;
-    minBigCircleSize: number;
+    bigCircleSize: IRangeParamValue;
     rpm: number;
     endThreshold: number;
 }
@@ -20,6 +20,7 @@ const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'];
 
 const paramsConfig = [
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'circles',
         min: 1,
         max: 10,
@@ -27,6 +28,7 @@ const paramsConfig = [
         defaultValue: 3,
     },
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'circlesSharingBigCircle',
         min: 1,
         max: 10,
@@ -34,27 +36,24 @@ const paramsConfig = [
         defaultValue: 1,
     },
     {
-        name: 'maxBigCircleSize',
-        min: 0.5,
-        max: 1,
-        step: 0.05,
-        defaultValue: 0.95,
+        type: ParamTypes.RANGE,
+        name: 'bigCircleSize',
+        min: 10,
+        max: 100,
+        step: 10,
+        defaultValue: { min: 40, max: 90 },
     },
     {
-        name: 'minBigCircleSize',
-        min: 0.1,
-        max: 0.45,
-        step: 0.05,
-        defaultValue: 0.4,
-    },
-    {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'rpm',
         min: 100,
         max: 300,
         step: 1,
         defaultValue: 200,
     },
+
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'endThreshold',
         min: 0.1,
         max: 10,
@@ -99,8 +98,8 @@ const getSketchDefinition = (params: ISketchParams) => {
                     .fill(null)
                     .map(() => {
                         const bigCircleSize = random(
-                            params.minBigCircleSize,
-                            params.maxBigCircleSize,
+                            params.bigCircleSize.min / 100,
+                            params.bigCircleSize.max / 100,
                             true
                         );
                         const denominator = random(2, 20);

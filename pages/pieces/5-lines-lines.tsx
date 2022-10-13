@@ -6,18 +6,17 @@ import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
+import { IRangeParamValue, ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     lineCreators: number;
-    minWidth: number;
-    maxWidth: number;
-    minSpeed: number;
-    maxSpeed: number;
-    minFreqChangeDirection: number;
-    maxFreqChangeDirection: number;
+    width: IRangeParamValue;
+    speed: IRangeParamValue;
+    freqChangeDirection: IRangeParamValue;
 }
 const paramsConfig = [
     {
+        type: ParamTypes.SINGLE_VALUE,
         name: 'lineCreators',
         min: 1,
         max: 20,
@@ -25,46 +24,28 @@ const paramsConfig = [
         defaultValue: 5,
     },
     {
-        name: 'minWidth',
+        type: ParamTypes.RANGE,
+        name: 'width',
         min: 5,
         max: 200,
         step: 5,
-        defaultValue: 5,
+        defaultValue: { min: 5, max: 100 },
     },
     {
-        name: 'maxWidth',
-        min: 5,
-        max: 200,
-        step: 5,
-        defaultValue: 100,
-    },
-    {
-        name: 'minSpeed',
+        type: ParamTypes.RANGE,
+        name: 'speed',
         min: 10,
         max: 2000,
         step: 10,
-        defaultValue: 80,
+        defaultValue: { min: 80, max: 1000 },
     },
     {
-        name: 'maxSpeed',
-        min: 10,
-        max: 2000,
-        step: 10,
-        defaultValue: 1000,
-    },
-    {
-        name: 'minFreqChangeDirection',
+        type: ParamTypes.RANGE,
+        name: 'freqChangeDirection',
         min: 1,
         max: 50,
         step: 1,
-        defaultValue: 2,
-    },
-    {
-        name: 'maxFreqChangeDirection',
-        min: 1,
-        max: 50,
-        step: 1,
-        defaultValue: 4,
+        defaultValue: { min: 2, max: 4 },
     },
 ];
 
@@ -162,11 +143,11 @@ class LineCreator {
     constructor(screenBounds: Bounds, params: ISketchParams) {
         this.position = Point.random(screenBounds);
         this.direction = random(0, POSSIBLE_DIRECTIONS.length - 1, false);
-        this.size = random(params.minWidth, params.maxWidth, false);
-        this.speed = random(params.minSpeed, params.maxSpeed, true);
+        this.size = random(params.width.min, params.width.max, false);
+        this.speed = random(params.speed.min, params.speed.max, true);
         this.chanceOfChangingDirection = random(
-            params.minFreqChangeDirection / 400,
-            params.maxFreqChangeDirection / 400,
+            params.freqChangeDirection.min / 400,
+            params.freqChangeDirection.max / 400,
             true
         );
     }
