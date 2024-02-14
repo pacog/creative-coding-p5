@@ -43,7 +43,6 @@ export default function PieceLayout({ children, id, tools }: PieceLayoutProps) {
                             </div>
                         </div>
                     </div>
-                    º
                     {tools && <div className={styles.HeaderTools}>{tools}</div>}
                 </div>
                 {children}

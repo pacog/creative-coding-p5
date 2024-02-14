@@ -4,7 +4,7 @@ import type P5 from 'p5';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
-import { ParamTypes } from './Params';
+import { ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
     param1: number;
@@ -22,7 +22,7 @@ const paramsConfig = [
 
 export default function PieceName() {
     const [params, setParams] = useState<ISketchParams>(
-        getInitialParamsValue(paramsConfig) as ISketchParams
+        getInitialParamsValue(paramsConfig) as ISketchParams,
     );
 
     return (
