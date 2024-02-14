@@ -1,22 +1,39 @@
 import { useState } from 'react';
 import type P5 from 'p5';
-// import chroma from 'chroma-js';
+import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { ParamTypes } from 'utils/Params';
 
+const COLORS = chroma.scale([
+    '#edf67d',
+    '#f896d8',
+    '#ca7df9',
+    '#724cf9',
+    '#564592',
+]);
+
 interface ISketchParams {
     blockSize: number;
+    colorSpeed: number;
 }
 const paramsConfig = [
     {
         type: ParamTypes.SINGLE_VALUE,
         name: 'blockSize',
-        min: 1,
-        max: 20,
+        min: 5,
+        max: 50,
         step: 1,
-        defaultValue: 10,
+        defaultValue: 20,
+    },
+    {
+        type: ParamTypes.SINGLE_VALUE,
+        name: 'colorSpeed',
+        min: 0,
+        max: 0.01,
+        step: 0.0001,
+        defaultValue: 0.001,
     },
 ];
 
@@ -54,8 +71,18 @@ interface Coordinate {
 const getSketchDefinition = (params: ISketchParams) => {
     return (p5: P5) => {
         let sandGrid: SandGrid;
+        let currentColorIndex = Math.random();
+        let currentColor = COLORS(currentColorIndex);
 
         p5.disableFriendlyErrors = true;
+
+        function updateColor() {
+            currentColorIndex += params.colorSpeed;
+            if (currentColorIndex > 1) {
+                currentColorIndex -= 1;
+            }
+            currentColor = COLORS(currentColorIndex);
+        }
 
         function createGrid(width: number, height: number): SandGrid {
             const data: Array<Array<string | null>> = [];
@@ -69,7 +96,7 @@ const getSketchDefinition = (params: ISketchParams) => {
             };
         }
         function addSand({ x, y }: Coordinate) {
-            sandGrid.data[x][y] = '#ddd';
+            sandGrid.data[x][y] = currentColor.hex();
         }
 
         function paintSand() {
@@ -107,10 +134,11 @@ const getSketchDefinition = (params: ISketchParams) => {
                     if (!pixelBelow) {
                         // If below doesn't have anything, move pixel
                         newGrid.data[x][y + 1] = value;
-                    } else {
-                        // There is already something in the pixel below, keep it
-                        newGrid.data[x][y] = value;
+                        continue;
                     }
+
+                    // There is already something in the pixel below, keep it
+                    newGrid.data[x][y] = value;
                 }
             }
 
@@ -161,8 +189,8 @@ const getSketchDefinition = (params: ISketchParams) => {
         p5.draw = () => {
             p5.background('#fff');
             paintSand();
-            // TODO: update every
             updateSand();
+            updateColor();
         };
     };
 };
