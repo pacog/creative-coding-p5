@@ -96,6 +96,9 @@ const getSketchDefinition = (params: ISketchParams) => {
             };
         }
         function addSand({ x, y }: Coordinate) {
+            if (x < 0 || y < 0 || x >= sandGrid.width || y >= sandGrid.height) {
+                return;
+            }
             sandGrid.data[x][y] = currentColor.hex();
         }
 
