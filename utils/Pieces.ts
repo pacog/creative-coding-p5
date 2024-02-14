@@ -1,3 +1,5 @@
+import type { StaticImageData } from 'next/image';
+
 import preview1 from './previewPieces/1.png';
 import preview2 from './previewPieces/2.png';
 import preview3 from './previewPieces/3.png';
