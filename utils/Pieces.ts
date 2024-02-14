@@ -6,6 +6,7 @@ import preview5 from './previewPieces/5.png';
 import preview6 from './previewPieces/6.png';
 import preview7 from './previewPieces/7.png';
 import preview8 from './previewPieces/8.png';
+import preview9 from './previewPieces/9.png';
 
 export interface IPiece {
     id: number;
@@ -66,9 +67,9 @@ export const piecesArray: IPiece[] = [
     },
     {
         title: 'Sand',
-        description: 'Sand TODO.',
+        description: 'Falling sand quick experiment.',
         url: '/pieces/9-sand',
-        previewImg: preview8,
+        previewImg: preview9,
     },
 ].map((piece, index) => ({ ...piece, id: index + 1 }));
 
