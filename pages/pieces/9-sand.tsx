@@ -78,28 +78,33 @@ const getSketchDefinition = (params: ISketchParams) => {
             }
         }
 
-        // function updateSand() {
-        //     const newMatrix = createMatrix(p5.windowWidth, p5.windowHeight);
-        //     matrix.forEach((x, y, value) => {
-        //         if (!value) {
-        //             return;
-        //         }
-        //         // We are at the bottom, we just keep whatever we have
-        //         if (y >= matrix.size.height - 2) {
-        //             newMatrix.setVal(x, y, value);
-        //             return;
-        //         }
-        //         const pixelBelow = matrix.getVal(x, y + 1);
-        //         if (!pixelBelow) {
-        //             // If below doesn't have anything, move pixel
-        //             newMatrix.setVal(x, y + 1, value);
-        //         } else {
-        //             // There is already something in the pixel below, keep it
-        //             newMatrix.setVal(x, y, value);
-        //         }
-        //     });
-        //     matrix = newMatrix;
-        // }
+        function updateSand() {
+            const newGrid = createGrid(sandGrid.width, sandGrid.height);
+            for (let x = 0; x < sandGrid.width; x++) {
+                for (let y = 0; y < sandGrid.height; y++) {
+                    const value = sandGrid.data[x][y];
+                    if (typeof value !== 'string') {
+                        continue;
+                    }
+
+                    // We are at the bottom, we just keep whatever we have
+                    if (y >= sandGrid.height - 2) {
+                        newGrid.data[x][y] = value;
+                        continue;
+                    }
+                    const pixelBelow = sandGrid.data[x][y + 1];
+                    if (!pixelBelow) {
+                        // If below doesn't have anything, move pixel
+                        newGrid.data[x][y + 1] = value;
+                    } else {
+                        // There is already something in the pixel below, keep it
+                        newGrid.data[x][y] = value;
+                    }
+                }
+            }
+
+            sandGrid = newGrid;
+        }
 
         p5.setup = () => {
             p5.createCanvas(p5.windowWidth, p5.windowHeight);
@@ -116,13 +121,15 @@ const getSketchDefinition = (params: ISketchParams) => {
 
         p5.windowResized = () => {
             p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+            // TODO: transfer data from old
+            sandGrid = createGrid(p5.windowWidth, p5.windowHeight);
         };
 
         p5.draw = () => {
             p5.background('#fff');
             paintSand();
             // TODO: update every
-            // updateSand();
+            updateSand();
         };
     };
 };
