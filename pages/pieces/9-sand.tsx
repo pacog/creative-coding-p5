@@ -168,14 +168,6 @@ const getSketchDefinition = (params: ISketchParams) => {
             sandGrid = createGrid(gridSize.x, gridSize.y);
         };
 
-        p5.mouseDragged = () => {
-            addSand(screenToGrid({ x: p5.mouseX, y: p5.mouseY }));
-        };
-
-        p5.mousePressed = () => {
-            addSand(screenToGrid({ x: p5.mouseX, y: p5.mouseY }));
-        };
-
         p5.windowResized = () => {
             p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
             // TODO: transfer data from old
@@ -188,6 +180,9 @@ const getSketchDefinition = (params: ISketchParams) => {
 
         p5.draw = () => {
             p5.background('#fff');
+            if (p5.mouseIsPressed) {
+                addSand(screenToGrid({ x: p5.mouseX, y: p5.mouseY }));
+            }
             paintSand();
             updateSand();
             updateColor();
