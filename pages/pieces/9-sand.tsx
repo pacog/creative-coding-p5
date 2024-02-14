@@ -123,29 +123,52 @@ const getSketchDefinition = (params: ISketchParams) => {
             const newGrid = createGrid(sandGrid.width, sandGrid.height);
             for (let x = 0; x < sandGrid.width; x++) {
                 for (let y = 0; y < sandGrid.height; y++) {
-                    const value = sandGrid.data[x][y];
-                    if (typeof value !== 'string') {
-                        continue;
-                    }
-
-                    // We are at the bottom, we just keep whatever we have
-                    if (y >= sandGrid.height - 1) {
-                        newGrid.data[x][y] = value;
-                        continue;
-                    }
-                    const pixelBelow = sandGrid.data[x][y + 1];
-                    if (!pixelBelow) {
-                        // If below doesn't have anything, move pixel
-                        newGrid.data[x][y + 1] = value;
-                        continue;
-                    }
-
-                    // There is already something in the pixel below, keep it
-                    newGrid.data[x][y] = value;
+                    updateSandGrain(x, y, newGrid);
                 }
             }
 
             sandGrid = newGrid;
+        }
+
+        function updateSandGrain(x: number, y: number, newGrid: SandGrid) {
+            const value = sandGrid.data[x][y];
+            if (typeof value !== 'string') {
+                return;
+            }
+
+            // We are at the bottom, we just keep whatever we have
+            if (y >= sandGrid.height - 1) {
+                newGrid.data[x][y] = value;
+                return;
+            }
+            const pixelBelow = sandGrid.data[x][y + 1];
+            if (!pixelBelow) {
+                // If below doesn't have anything, move pixel
+                newGrid.data[x][y + 1] = value;
+                return;
+            }
+
+            // Check pixels below to the sides
+            let sideToCheck = Math.random() < 0.5 ? 1 : -1;
+            let xToCheck = sideToCheck + x;
+            if (xWithinGrid(xToCheck) && !sandGrid.data[xToCheck][y + 1]) {
+                newGrid.data[xToCheck][y + 1] = value;
+                return;
+            }
+
+            sideToCheck = sideToCheck * -1;
+            xToCheck = sideToCheck + x;
+            if (xWithinGrid(xToCheck) && !sandGrid.data[xToCheck][y + 1]) {
+                newGrid.data[xToCheck][y + 1] = value;
+                return;
+            }
+
+            // There is already something in the pixel below, keep it
+            newGrid.data[x][y] = value;
+        }
+
+        function xWithinGrid(x: number) {
+            return x > 0 && x < sandGrid.width;
         }
 
         function screenToGrid({ x, y }: Coordinate): Coordinate {
@@ -160,6 +183,12 @@ const getSketchDefinition = (params: ISketchParams) => {
                 x: x * params.blockSize,
                 y: y * params.blockSize,
             };
+        }
+
+        function addSandIfPressed() {
+            if (p5.mouseIsPressed) {
+                addSand(screenToGrid({ x: p5.mouseX, y: p5.mouseY }));
+            }
         }
 
         p5.setup = () => {
@@ -183,9 +212,7 @@ const getSketchDefinition = (params: ISketchParams) => {
 
         p5.draw = () => {
             p5.background('#fff');
-            if (p5.mouseIsPressed) {
-                addSand(screenToGrid({ x: p5.mouseX, y: p5.mouseY }));
-            }
+            addSandIfPressed();
             paintSand();
             updateSand();
             updateColor();
