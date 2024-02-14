@@ -65,14 +65,22 @@ export class Matrix<T> {
                 let rowWithin = wrapValue(destinyRow + row, this.height);
                 let columnWithin = wrapValue(
                     destinyColumn + column,
-                    this.width
+                    this.width,
                 );
 
                 this.setVal(
                     rowWithin,
                     columnWithin,
-                    otherMatrix.getVal(row, column)
+                    otherMatrix.getVal(row, column),
                 );
+            }
+        }
+    }
+
+    forEach(callback: (row: number, column: number, value: T) => void) {
+        for (let row = 0; row < this.size.height; row++) {
+            for (let column = 0; column < this.size.height; column++) {
+                callback(row, column, this.m[row][column]);
             }
         }
     }

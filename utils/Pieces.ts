@@ -64,6 +64,12 @@ export const piecesArray: IPiece[] = [
         url: '/pieces/8-blanket',
         previewImg: preview8,
     },
+    {
+        title: 'Sand',
+        description: 'Sand TODO.',
+        url: '/pieces/9-sand',
+        previewImg: preview8,
+    },
 ].map((piece, index) => ({ ...piece, id: index + 1 }));
 
 export const pieces: { [key: number]: IPiece } = piecesArray.reduce(
@@ -73,5 +79,5 @@ export const pieces: { [key: number]: IPiece } = piecesArray.reduce(
             [piece.id]: piece,
         };
     },
-    {}
+    {},
 );
