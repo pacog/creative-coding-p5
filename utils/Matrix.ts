@@ -65,13 +65,13 @@ export class Matrix<T> {
                 let rowWithin = wrapValue(destinyRow + row, this.height);
                 let columnWithin = wrapValue(
                     destinyColumn + column,
-                    this.width
+                    this.width,
                 );
 
                 this.setVal(
                     rowWithin,
                     columnWithin,
-                    otherMatrix.getVal(row, column)
+                    otherMatrix.getVal(row, column),
                 );
             }
         }

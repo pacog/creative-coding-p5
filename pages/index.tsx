@@ -51,27 +51,25 @@ interface PieceLinkProps {
 
 function PieceLink({ piece }: PieceLinkProps) {
     return (
-        <Link href={piece.url}>
-            <a className={styles.piece}>
-                <div className={styles.pieceBG}>
-                    <Image
-                        layout="fill"
-                        objectFit="cover"
-                        src={piece.previewImg}
-                        alt=""
-                        priority={true}
-                    />
-                </div>
+        <Link href={piece.url} className={styles.piece}>
+            <div className={styles.pieceBG}>
+                <Image
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    src={piece.previewImg}
+                    alt=""
+                    priority={true}
+                />
+            </div>
 
-                <div className={styles.pieceText}>
-                    <div className={styles.pieceTitle}>
-                        [{piece.id}] {piece.title}
-                    </div>
-                    <div className={styles.pieceDescription}>
-                        {piece.description}
-                    </div>
+            <div className={styles.pieceText}>
+                <div className={styles.pieceTitle}>
+                    [{piece.id}] {piece.title}
                 </div>
-            </a>
+                <div className={styles.pieceDescription}>
+                    {piece.description}
+                </div>
+            </div>
         </Link>
     );
 }
