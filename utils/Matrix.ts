@@ -76,14 +76,6 @@ export class Matrix<T> {
             }
         }
     }
-
-    forEach(callback: (row: number, column: number, value: T) => void) {
-        for (let row = 0; row < this.size.height; row++) {
-            for (let column = 0; column < this.size.height; column++) {
-                callback(row, column, this.m[row][column]);
-            }
-        }
-    }
 }
 
 export function createFromValues<T>(values: T[][]) {

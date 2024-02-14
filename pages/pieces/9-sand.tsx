@@ -5,7 +5,6 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { ParamTypes } from 'utils/Params';
-import { Matrix } from 'utils/Matrix';
 
 interface ISketchParams {
     param1: number;
@@ -40,23 +39,71 @@ export default function Sand() {
         </PieceLayout>
     );
 }
+
+interface SandGrid {
+    height: number;
+    width: number;
+    data: Array<Array<string | null>>;
+}
+
 const getSketchDefinition = (params: ISketchParams) => {
     return (p5: P5) => {
-        let matrix: Matrix<string | null>;
+        let sandGrid: SandGrid;
 
         p5.disableFriendlyErrors = true;
 
-        function addSand(x: number, y: number) {
-            matrix.setVal(x, y, '#ddd');
+        function createGrid(width: number, height: number): SandGrid {
+            const data: Array<Array<string | null>> = [];
+            for (let i = 0; i < width; i++) {
+                data.push(new Array(height).fill(null));
+            }
+            return {
+                width,
+                height,
+                data,
+            };
         }
+        function addSand(x: number, y: number) {
+            sandGrid.data[x][y] = '#ddd';
+        }
+
+        function paintSand() {
+            for (let x = 0; x < sandGrid.width; x++) {
+                for (let y = 0; y < sandGrid.height; y++) {
+                    if (typeof sandGrid.data[x][y] === 'string') {
+                        p5.fill(sandGrid.data[x][y]);
+                        p5.square(x, y, 1);
+                    }
+                }
+            }
+        }
+
+        // function updateSand() {
+        //     const newMatrix = createMatrix(p5.windowWidth, p5.windowHeight);
+        //     matrix.forEach((x, y, value) => {
+        //         if (!value) {
+        //             return;
+        //         }
+        //         // We are at the bottom, we just keep whatever we have
+        //         if (y >= matrix.size.height - 2) {
+        //             newMatrix.setVal(x, y, value);
+        //             return;
+        //         }
+        //         const pixelBelow = matrix.getVal(x, y + 1);
+        //         if (!pixelBelow) {
+        //             // If below doesn't have anything, move pixel
+        //             newMatrix.setVal(x, y + 1, value);
+        //         } else {
+        //             // There is already something in the pixel below, keep it
+        //             newMatrix.setVal(x, y, value);
+        //         }
+        //     });
+        //     matrix = newMatrix;
+        // }
 
         p5.setup = () => {
             p5.createCanvas(p5.windowWidth, p5.windowHeight);
-            matrix = new Matrix<string | null>(
-                p5.windowWidth,
-                p5.windowHeight,
-                null,
-            );
+            sandGrid = createGrid(p5.windowWidth, p5.windowHeight);
         };
 
         p5.mouseDragged = () => {
@@ -73,12 +120,9 @@ const getSketchDefinition = (params: ISketchParams) => {
 
         p5.draw = () => {
             p5.background('#fff');
-            matrix.forEach((x, y, value) => {
-                if (typeof value === 'string') {
-                    p5.fill(value);
-                    p5.square(x, y, 1);
-                }
-            });
+            paintSand();
+            // TODO: update every
+            // updateSand();
         };
     };
 };
