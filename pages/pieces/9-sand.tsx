@@ -7,16 +7,16 @@ import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { ParamTypes } from 'utils/Params';
 
 interface ISketchParams {
-    param1: number;
+    blockSize: number;
 }
 const paramsConfig = [
     {
         type: ParamTypes.SINGLE_VALUE,
-        name: 'param1',
+        name: 'blockSize',
         min: 1,
         max: 20,
         step: 1,
-        defaultValue: 5,
+        defaultValue: 10,
     },
 ];
 
@@ -46,6 +46,11 @@ interface SandGrid {
     data: Array<Array<string | null>>;
 }
 
+interface Coordinate {
+    x: number;
+    y: number;
+}
+
 const getSketchDefinition = (params: ISketchParams) => {
     return (p5: P5) => {
         let sandGrid: SandGrid;
@@ -63,7 +68,7 @@ const getSketchDefinition = (params: ISketchParams) => {
                 data,
             };
         }
-        function addSand(x: number, y: number) {
+        function addSand({ x, y }: Coordinate) {
             sandGrid.data[x][y] = '#ddd';
         }
 
@@ -72,7 +77,13 @@ const getSketchDefinition = (params: ISketchParams) => {
                 for (let y = 0; y < sandGrid.height; y++) {
                     if (typeof sandGrid.data[x][y] === 'string') {
                         p5.fill(sandGrid.data[x][y]);
-                        p5.square(x, y, 1);
+                        p5.noStroke();
+                        const screenCoordinates = gridToScreen({ x, y });
+                        p5.square(
+                            screenCoordinates.x,
+                            screenCoordinates.y,
+                            params.blockSize,
+                        );
                     }
                 }
             }
@@ -88,7 +99,7 @@ const getSketchDefinition = (params: ISketchParams) => {
                     }
 
                     // We are at the bottom, we just keep whatever we have
-                    if (y >= sandGrid.height - 2) {
+                    if (y >= sandGrid.height - 1) {
                         newGrid.data[x][y] = value;
                         continue;
                     }
@@ -106,23 +117,45 @@ const getSketchDefinition = (params: ISketchParams) => {
             sandGrid = newGrid;
         }
 
+        function screenToGrid({ x, y }: Coordinate): Coordinate {
+            return {
+                x: Math.floor(x / params.blockSize),
+                y: Math.floor(y / params.blockSize),
+            };
+        }
+
+        function gridToScreen({ x, y }: Coordinate): Coordinate {
+            return {
+                x: x * params.blockSize,
+                y: y * params.blockSize,
+            };
+        }
+
         p5.setup = () => {
             p5.createCanvas(p5.windowWidth, p5.windowHeight);
-            sandGrid = createGrid(p5.windowWidth, p5.windowHeight);
+            const gridSize = screenToGrid({
+                x: p5.windowWidth,
+                y: p5.windowHeight,
+            });
+            sandGrid = createGrid(gridSize.x, gridSize.y);
         };
 
         p5.mouseDragged = () => {
-            addSand(p5.mouseX, p5.mouseY);
+            addSand(screenToGrid({ x: p5.mouseX, y: p5.mouseY }));
         };
 
         p5.mousePressed = () => {
-            addSand(p5.mouseX, p5.mouseY);
+            addSand(screenToGrid({ x: p5.mouseX, y: p5.mouseY }));
         };
 
         p5.windowResized = () => {
             p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
             // TODO: transfer data from old
-            sandGrid = createGrid(p5.windowWidth, p5.windowHeight);
+            const gridSize = screenToGrid({
+                x: p5.windowWidth,
+                y: p5.windowHeight,
+            });
+            sandGrid = createGrid(gridSize.x, gridSize.y);
         };
 
         p5.draw = () => {
