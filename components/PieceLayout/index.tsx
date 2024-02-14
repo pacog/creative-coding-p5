@@ -26,17 +26,15 @@ export default function PieceLayout({ children, id, tools }: PieceLayoutProps) {
             <div className={styles.Container}>
                 <div className={styles.Header}>
                     <div className={styles.HeaderNavigation}>
-                        <Link href="/">
-                            <a className={styles.HeaderLink}>
-                                <div className={styles.HeaderLinkIcon}>
-                                    <Image
-                                        src="/icons/arrow_back_icon.svg"
-                                        height={32}
-                                        width={32}
-                                        alt="Back"
-                                    />
-                                </div>
-                            </a>
+                        <Link href="/" className={styles.HeaderLink}>
+                            <div className={styles.HeaderLinkIcon}>
+                                <Image
+                                    src="/icons/arrow_back_icon.svg"
+                                    height={32}
+                                    width={32}
+                                    alt="Back"
+                                />
+                            </div>
                         </Link>
                         <div className={styles.HeaderText}>
                             <div className={styles.HeaderTitle}>{title}</div>
@@ -45,7 +43,7 @@ export default function PieceLayout({ children, id, tools }: PieceLayoutProps) {
                             </div>
                         </div>
                     </div>
-
+                    º
                     {tools && <div className={styles.HeaderTools}>{tools}</div>}
                 </div>
                 {children}
