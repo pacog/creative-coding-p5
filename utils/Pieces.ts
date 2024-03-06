@@ -9,6 +9,7 @@ import preview6 from './previewPieces/6.png';
 import preview7 from './previewPieces/7.png';
 import preview8 from './previewPieces/8.png';
 import preview9 from './previewPieces/9.png';
+import preview10 from './previewPieces/10.png';
 
 export interface IPiece {
     id: number;
@@ -72,6 +73,12 @@ export const piecesArray: IPiece[] = [
         description: 'Falling sand quick experiment.',
         url: '/pieces/9-sand',
         previewImg: preview9,
+    },
+    {
+        title: 'Shady shaders',
+        description: 'First experiment with shaders.',
+        url: '/pieces/10-shaders',
+        previewImg: preview10,
     },
 ].map((piece, index) => ({ ...piece, id: index + 1 }));
 
