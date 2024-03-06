@@ -39,16 +39,48 @@ export default function Shaders() {
         </PieceLayout>
     );
 }
+
+const fragmentShader = `
+precision mediump float;
+
+varying vec2 vTexCoord;
+
+void main() {
+    // now because of the varying vTexCoord, we can access the current texture coordinate
+    vec2 uv = vTexCoord;
+
+    // and now these coordinates are assigned to the color output of the shader
+    gl_FragColor = vec4(uv,1.0,1.0);
+}
+`;
+
+const vertexShader = `
+// position information that is used with gl_Position
+attribute vec3 aPosition;
+
+// texture coordinates
+attribute vec2 aTexCoord;
+
+// the varying variable will pass the texture coordinate to our fragment shader
+varying vec2 vTexCoord;
+
+void main() {
+    // assign attribute to varying, so it can be used in the fragment
+    vTexCoord = aTexCoord;
+
+    vec4 positionVec4 = vec4(aPosition, 1.0);
+    positionVec4.xy = positionVec4.xy * 2.0 - 1.0;
+    gl_Position = positionVec4;
+}
+`;
+
 const getSketchDefinition = (params: ISketchParams) => {
     return (p5: P5) => {
         p5.disableFriendlyErrors = true;
         let myShader: P5.Shader;
 
         p5.preload = () => {
-            myShader = p5.loadShader(
-                '/pages/10/shader.vert',
-                '/pages/10/shader.frag',
-            );
+            myShader = p5.createShader(vertexShader, fragmentShader);
         };
 
         p5.setup = () => {
