@@ -73,6 +73,12 @@ export const piecesArray: IPiece[] = [
         url: '/pieces/9-sand',
         previewImg: preview9,
     },
+    {
+        title: 'Shady shaders',
+        description: 'Learning shaders.',
+        url: '/pieces/10-shaders',
+        previewImg: preview9,
+    },
 ].map((piece, index) => ({ ...piece, id: index + 1 }));
 
 export const pieces: { [key: number]: IPiece } = piecesArray.reduce(
