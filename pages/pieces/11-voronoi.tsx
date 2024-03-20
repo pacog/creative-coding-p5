@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import type P5 from 'p5';
-// import chroma from 'chroma-js';
+import chroma from 'chroma-js';
 import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { ParamTypes } from 'utils/Params';
-import { Line, Point, Bounds, Circle } from '@mathigon/euclid';
+import { Line, Point, Bounds, Circle, Polygon } from '@mathigon/euclid';
 import { now, range } from 'lodash';
+import { Delaunay } from 'd3-delaunay';
 
 interface ISketchParams {
     points: number;
@@ -77,7 +78,19 @@ const getSketchDefinition = (params: ISketchParams) => {
 
         p5.draw = () => {
             p5.background('#fff');
-            console.log(points);
+
+            const voronoyPolygons = getVoronoiPolygons(
+                points,
+                new Bounds(0, p5.windowWidth, 0, p5.windowHeight - 0),
+            );
+            voronoyPolygons.forEach((polygon) => {
+                p5.fill(chroma.random().hex());
+                p5.beginShape();
+                polygon.points.forEach((point) => {
+                    p5.vertex(point.x, point.y);
+                });
+                p5.endShape(p5.CLOSE);
+            });
             points.forEach((point) => {
                 p5.stroke('#000');
                 p5.strokeWeight(10);
@@ -86,3 +99,18 @@ const getSketchDefinition = (params: ISketchParams) => {
         };
     };
 };
+
+function getVoronoiPolygons(points: Point[], viewport: Bounds): Polygon[] {
+    const flatCoordinates = points.map(getDelaunayPoint);
+    const d = Delaunay.from(flatCoordinates);
+    const { xMin, xMax, yMin, yMax } = viewport;
+    const voronoi = d.voronoi([xMin, yMin, xMax, yMax]);
+    return Array.from(voronoi.cellPolygons()).map((polygon) => {
+        const points = polygon.map(([x, y]) => new Point(x, y));
+        return new Polygon(...points);
+    });
+}
+
+function getDelaunayPoint(point: Point): Delaunay.Point {
+    return [point.x, point.y];
+}
