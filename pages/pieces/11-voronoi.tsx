@@ -10,8 +10,6 @@ import { now, random, range } from 'lodash';
 import { Delaunay } from 'd3-delaunay';
 import { keepNumberInside } from 'utils/number';
 
-const COLORS = chroma.scale(['f9c80e', 'f86624', 'ea3546', '662e9b', '43bccd']);
-
 interface ISketchParams {
     points: number;
     padding: number;
@@ -106,7 +104,7 @@ const getSketchDefinition = (params: ISketchParams) => {
                     random(0, params.maxSpeed, true),
                     random(0, params.maxSpeed, true),
                 ),
-                color: COLORS(Math.random()),
+                color: getRandomColor(),
             }));
         };
 
@@ -182,4 +180,26 @@ function getDelaunayPoint(customPoint: CustomPoint): Delaunay.Point {
 function getPolygonFromDelaunayPolygon(polygon: Delaunay.Polygon): Polygon {
     const points = polygon.map(([x, y]) => new Point(x, y));
     return new Polygon(...points);
+}
+
+function getRandomColor() {
+    // const h = random(0, 360);
+    // const c = random(20, 70);
+    // const l = 100 - c;
+    // return chroma.hcl(h, c, l);
+    const colors = chroma.scale([
+        'f94144',
+        'f3722c',
+        'f8961e',
+        'f9c74f',
+        '90be6d',
+        '43aa8b',
+        '577590',
+        '390099',
+        '9e0059',
+        'ff0054',
+        'ff5400',
+        'ffbd00',
+    ]);
+    return colors(Math.random());
 }
