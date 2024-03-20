@@ -10,6 +10,7 @@ import preview7 from './previewPieces/7.png';
 import preview8 from './previewPieces/8.png';
 import preview9 from './previewPieces/9.png';
 import preview10 from './previewPieces/10.png';
+import preview11 from './previewPieces/11.png';
 
 export interface IPiece {
     id: number;
@@ -79,6 +80,12 @@ export const piecesArray: IPiece[] = [
         description: 'First experiment with shaders.',
         url: '/pieces/10-shaders',
         previewImg: preview10,
+    },
+    {
+        title: 'Voronoi',
+        description: 'Playing with Voronoi diagrams',
+        url: '/pieces/11-voronoi',
+        previewImg: preview11,
     },
 ].map((piece, index) => ({ ...piece, id: index + 1 }));
 
