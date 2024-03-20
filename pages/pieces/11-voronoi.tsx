@@ -5,13 +5,18 @@ import P5Sketch from 'components/P5Sketch';
 import PieceLayout from 'components/PieceLayout';
 import SketchParams, { getInitialParamsValue } from 'components/SketchParams';
 import { ParamTypes } from 'utils/Params';
-import { Line, Point, Bounds, Circle, Polygon } from '@mathigon/euclid';
-import { now, range } from 'lodash';
+import { Point, Bounds, Polygon } from '@mathigon/euclid';
+import { now, random, range } from 'lodash';
 import { Delaunay } from 'd3-delaunay';
+import { keepNumberInside } from 'utils/number';
+
+const COLORS = chroma.scale(['f9c80e', 'f86624', 'ea3546', '662e9b', '43bccd']);
 
 interface ISketchParams {
     points: number;
     padding: number;
+    maxSpeed: number;
+    pointSize: number;
 }
 const paramsConfig = [
     {
@@ -20,7 +25,7 @@ const paramsConfig = [
         min: 2,
         max: 100,
         step: 1,
-        defaultValue: 5,
+        defaultValue: 19,
     },
     {
         type: ParamTypes.SINGLE_VALUE,
@@ -29,6 +34,22 @@ const paramsConfig = [
         max: 300,
         step: 1,
         defaultValue: 100,
+    },
+    {
+        type: ParamTypes.SINGLE_VALUE,
+        name: 'maxSpeed',
+        min: 0,
+        max: 10,
+        step: 0.1,
+        defaultValue: 1,
+    },
+    {
+        type: ParamTypes.SINGLE_VALUE,
+        name: 'pointSize',
+        min: 0,
+        max: 10,
+        step: 1,
+        defaultValue: 0,
     },
 ];
 
@@ -53,7 +74,7 @@ export default function Voronoi() {
 }
 
 interface CustomPoint {
-    point: Point;
+    position: Point;
     id: number;
     speed: Point;
     color: Color;
@@ -71,9 +92,8 @@ const getSketchDefinition = (params: ISketchParams) => {
 
         p5.setup = () => {
             p5.createCanvas(p5.windowWidth, p5.windowHeight);
-            p5.noLoop();
             points = range(params.points).map((index) => ({
-                point: Point.random(
+                position: Point.random(
                     new Bounds(
                         params.padding,
                         p5.windowWidth - params.padding,
@@ -82,8 +102,11 @@ const getSketchDefinition = (params: ISketchParams) => {
                     ),
                 ),
                 id: index,
-                speed: new Point(0, 0),
-                color: chroma.random(),
+                speed: new Point(
+                    random(0, params.maxSpeed, true),
+                    random(0, params.maxSpeed, true),
+                ),
+                color: COLORS(Math.random()),
             }));
         };
 
@@ -93,12 +116,10 @@ const getSketchDefinition = (params: ISketchParams) => {
 
         p5.draw = () => {
             p5.background('#fff');
-
+            const bounds = new Bounds(0, p5.windowWidth, 0, p5.windowHeight);
+            points = updatePoints(points, bounds);
             const voronoyPointsWithPolygons =
-                getVoronoiPointsWithPolygonsPolygons(
-                    points,
-                    new Bounds(0, p5.windowWidth, 0, p5.windowHeight - 0),
-                );
+                getVoronoiPointsWithPolygonsPolygons(points, bounds);
             voronoyPointsWithPolygons.forEach((pointWithPolygon) => {
                 p5.fill(pointWithPolygon.color.hex());
                 p5.strokeWeight(10);
@@ -109,11 +130,33 @@ const getSketchDefinition = (params: ISketchParams) => {
                 p5.endShape(p5.CLOSE);
 
                 p5.stroke('#000');
-                p5.strokeWeight(10);
-                p5.point(pointWithPolygon.point.x, pointWithPolygon.point.y);
+                p5.strokeWeight(params.pointSize);
+                p5.point(
+                    pointWithPolygon.position.x,
+                    pointWithPolygon.position.y,
+                );
             });
         };
     };
+
+    function updatePoints(points: CustomPoint[], bounds: Bounds) {
+        return points.map((point) => {
+            const newX = keepNumberInside(
+                point.position.x + point.speed.x,
+                bounds.xMin,
+                bounds.xMax,
+            );
+            const newY = keepNumberInside(
+                point.position.y + point.speed.y,
+                bounds.yMin,
+                bounds.yMax,
+            );
+            return {
+                ...point,
+                position: new Point(newX, newY),
+            };
+        });
+    }
 };
 
 function getVoronoiPointsWithPolygonsPolygons(
@@ -133,7 +176,7 @@ function getVoronoiPointsWithPolygonsPolygons(
 }
 
 function getDelaunayPoint(customPoint: CustomPoint): Delaunay.Point {
-    return [customPoint.point.x, customPoint.point.y];
+    return [customPoint.position.x, customPoint.position.y];
 }
 
 function getPolygonFromDelaunayPolygon(polygon: Delaunay.Polygon): Polygon {
